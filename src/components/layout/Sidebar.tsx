@@ -15,7 +15,9 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
 const PRIMARY_NAV = [
@@ -37,6 +39,8 @@ export function Sidebar() {
   // Default to expanded to match SSR, then read localStorage on mount
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [mounted, setMounted] = React.useState(false)
+  const [isAdmin, setIsAdmin] = React.useState(false)
+  const { user } = useAuth()
 
   React.useEffect(() => {
     setMounted(true)
@@ -45,6 +49,19 @@ export function Sidebar() {
       setIsCollapsed(true)
     }
   }, [])
+
+  React.useEffect(() => {
+    if (user) {
+      const fetchRole = async () => {
+        const supabase = createClient()
+        const { data } = await supabase.from('users').select('role').eq('id', user.id).single()
+        if (data?.role === 'admin') {
+          setIsAdmin(true)
+        }
+      }
+      fetchRole()
+    }
+  }, [user])
 
   const toggleSidebar = () => {
     const newState = !isCollapsed
@@ -149,6 +166,17 @@ export function Sidebar() {
             </Link>
           )
         })}
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            title={isCollapsed ? 'Admin Panel' : undefined}
+            className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors text-emerald-600 dark:text-emerald-500 hover:bg-emerald-500/10"
+          >
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            {!isCollapsed && <span className="truncate">Admin Panel</span>}
+          </Link>
+        )}
         
         <button
           onClick={handleSignOut}

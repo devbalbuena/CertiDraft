@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ArrowLeft, Hammer } from 'lucide-react'
+import { ArrowLeft, Hammer, Pencil } from 'lucide-react'
+import { CardDescription, CardFooter } from '@/components/ui/card'
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const {
@@ -27,7 +29,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
       *,
       templates (name)
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
@@ -121,11 +123,39 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
         </TabsContent>
 
         <TabsContent value="design" className="mt-0">
-          <EmptyState
-            title="Certificate builder coming in Phase 6"
-            description="The drag-and-drop template designer and variable configuration will be located here."
-            icon={Hammer}
-          />
+          <div className="max-w-lg">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Certificate Design</CardTitle>
+                  {project.elements ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2.5 py-0.5 text-xs font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                      Design saved
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 px-2.5 py-0.5 text-xs font-medium">
+                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+                      No design yet
+                    </span>
+                  )}
+                </div>
+                <CardDescription>
+                  {project.elements
+                    ? 'A certificate design has been saved for this project. Open the builder to edit it.'
+                    : 'No design has been created yet. Open the certificate builder to design your certificate template.'}
+                </CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Button asChild>
+                  <Link href={`/dashboard/projects/${project.id}/design`}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Open Certificate Builder
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="generate" className="mt-0">

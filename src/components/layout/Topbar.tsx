@@ -27,7 +27,14 @@ export function Topbar() {
 
   // Create a simple breadcrumb from the pathname
   const segments = pathname.split('/').filter(Boolean)
-  const currentSegment = segments[segments.length - 1] || 'Overview'
+  let currentSegment = segments[segments.length - 1] || 'Overview'
+  
+  // If the segment looks like a UUID, rename it to "Project"
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentSegment)
+  if (isUUID) {
+    currentSegment = 'Project'
+  }
+
   const title = currentSegment.charAt(0).toUpperCase() + currentSegment.slice(1)
 
   return (
