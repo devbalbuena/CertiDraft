@@ -12,7 +12,7 @@ export function getTemplateElements(templateName: string): string {
 
   if (templateName === 'Minimal') {
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'CERTIFICATE OF ACHIEVEMENT',
       left: 421,
       top: 150,
@@ -25,7 +25,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'This is to certify that',
       left: 421,
       top: 220,
@@ -37,7 +37,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{recipient_name}}',
       left: 421,
       top: 280,
@@ -50,7 +50,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{achievement}}',
       left: 421,
       top: 350,
@@ -62,7 +62,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{citation_text}}',
       left: 421,
       top: 400,
@@ -74,7 +74,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'Issued on {{issued_date}}',
       left: 421,
       top: 500,
@@ -111,7 +111,7 @@ export function getTemplateElements(templateName: string): string {
       ry: 0,
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'CERTIFICATE',
       left: 421,
       top: 140,
@@ -124,7 +124,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{recipient_name}}',
       left: 421,
       top: 260,
@@ -137,7 +137,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{achievement}}',
       left: 421,
       top: 340,
@@ -149,7 +149,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{citation_text}}',
       left: 421,
       top: 390,
@@ -161,7 +161,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{issued_date}}',
       left: 150,
       top: 480,
@@ -173,7 +173,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'Date',
       left: 150,
       top: 500,
@@ -197,7 +197,7 @@ export function getTemplateElements(templateName: string): string {
       ry: 0,
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'CERTIFICATE OF COMPLETION',
       left: 421,
       top: 60,
@@ -210,7 +210,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{recipient_name}}',
       left: 421,
       top: 250,
@@ -223,7 +223,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{achievement}}',
       left: 421,
       top: 320,
@@ -235,7 +235,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: '{{citation_text}}',
       left: 421,
       top: 380,
@@ -247,7 +247,7 @@ export function getTemplateElements(templateName: string): string {
       originY: 'center',
     })
     objects.push({
-      type: 'FabricText',
+      type: 'Textbox',
       text: 'Date: {{issued_date}}',
       left: 421,
       top: 480,

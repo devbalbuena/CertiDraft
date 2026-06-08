@@ -52,14 +52,16 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
 
   // ── Add Elements ────────────────────────────────────────────────────────
-  const addText = (text = 'Enter text') => {
+  const addText = (text = 'Double click to edit') => {
     if (!canvas) return
-    const textObj = new fabric.FabricText(text, {
+    const textObj = new fabric.Textbox(text, {
       left: 421,
       top: 297,
       fontFamily: 'Inter',
-      fontSize: 32,
+      fontSize: 24,
       fill: '#000000',
+      width: 300,
+      textAlign: 'center',
       originX: 'center',
       originY: 'center',
     })
@@ -138,10 +140,12 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
       originX: 'center',
       originY: 'center',
     })
-    const text = new fabric.FabricText('QR Code', {
-      fontSize: 16,
+    const text = new fabric.Textbox('QR Code', {
+      fontSize: 14,
+      textAlign: 'center',
       originX: 'center',
       originY: 'center',
+      width: 90,
     })
     // @ts-ignore
     const group = new fabric.Group([rect, text], {
