@@ -29,20 +29,32 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
     })
 
     const initCanvas = async () => {
+      // Check before doing ANY async work — in React Strict Mode, the cleanup
+      // (dispose) can run between the effect firing and the first microtask.
+      if (disposed) return
+
       if (initialData) {
         try {
           const parsed = JSON.parse(initialData)
+          // Check again before awaiting: loadFromJSON calls clearRect internally,
+          // which will throw if the canvas was disposed between here and await.
+          if (disposed) return
           await canvas.loadFromJSON(parsed)
-          // Guard: if cleanup ran while we were awaiting, stop here
           if (disposed) return
           canvas.renderAll()
         } catch (e) {
-          console.error('Failed to load initial data', e)
+          // In React Strict Mode (dev only), the canvas may be disposed mid-await.
+          // When disposed is true this error is expected — silence it so the
+          // browser overlay doesn't surface a false alarm.
+          if (!disposed) {
+            console.error('Failed to load canvas data:', e)
+          }
         }
       }
+
       if (disposed) return
-      pushHistory(JSON.stringify(canvas.toJSON()))
       isInitializingRef.current = false
+      pushHistory(JSON.stringify(canvas.toJSON()))
     }
 
     // Set canvas in store first so toolbar/panels can reference it
