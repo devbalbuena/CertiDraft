@@ -37,11 +37,13 @@ export async function POST(
   // ── Validate Request Body ─────────────────────────────────────────────────
   let csv_data: any[]
   let column_mapping: Record<string, string>
+  let default_citation_text: string | undefined
 
   try {
     const body = await req.json()
     csv_data = body.csv_data
     column_mapping = body.column_mapping
+    default_citation_text = body.default_citation_text
 
     if (!Array.isArray(csv_data) || csv_data.length === 0) {
       throw new Error('csv_data must be a non-empty array')
@@ -83,7 +85,10 @@ export async function POST(
   // ── Enqueue the Job ───────────────────────────────────────────────────────
   try {
     const queue = getCertificateQueue()
-    await queue.add(batchJob.id, { batchJobId: batchJob.id })
+    await queue.add(batchJob.id, { 
+      batchJobId: batchJob.id,
+      defaultCitationText: default_citation_text
+    })
   } catch (e: any) {
     console.error('Failed to add job to queue:', e)
     // Don't fail the whole request — the job exists in the DB and can be retried

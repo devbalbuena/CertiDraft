@@ -16,6 +16,8 @@ import { createClient } from '@supabase/supabase-js'
 import puppeteer from 'puppeteer'
 import crypto from 'crypto'
 import ws from 'ws'
+import { sendCertificateEmail } from '../src/lib/email/sendgrid'
+import { PLAN_LIMITS, type PlanType } from '../src/lib/subscriptions'
 
 // ── Environment ───────────────────────────────────────────────────────────────
 const REDIS_URL = process.env.REDIS_URL!
@@ -109,7 +111,7 @@ async function generateCertificatePDF(designJson: string): Promise<Buffer> {
 
 // ── Worker Job Handler ────────────────────────────────────────────────────────
 async function processJob(job: Job): Promise<void> {
-  const { batchJobId } = job.data as { batchJobId: string }
+  const { batchJobId, defaultCitationText = '' } = job.data as { batchJobId: string; defaultCitationText?: string }
   console.log(`\n📋 Processing batch job: ${batchJobId}`)
 
   // ── Fetch batch job details ──────────────────────────────────────────────
@@ -144,6 +146,16 @@ async function processJob(job: Job): Promise<void> {
     .eq('id', batchJob.project_id)
     .single()
 
+  // ── Fetch user's plan ────────────────────────────────────────────────────
+  const { data: userProfile } = await supabase
+    .from('users')
+    .select('plan')
+    .eq('id', batchJob.user_id)
+    .single()
+  
+  const plan = (userProfile?.plan as PlanType) || 'free'
+  const canSendEmail = PLAN_LIMITS[plan]?.features.email_delivery || false
+
   // ── Process each recipient ───────────────────────────────────────────────
   for (let i = 0; i < csvRows.length; i++) {
     const row = csvRows[i]
@@ -164,7 +176,7 @@ async function processJob(job: Job): Promise<void> {
       const vars: Record<string, string> = {
         recipient_name: recipientName,
         achievement: achievement,
-        citation_text: '',
+        citation_text: row[mapping['citation_text']] || defaultCitationText || '',
         issued_date: issuedDate,
         grade: grade,
         issuer_name: 'CertiDraft',
@@ -206,6 +218,28 @@ async function processJob(job: Job): Promise<void> {
 
       if (certError) {
         throw new Error(`Certificate insert failed: ${certError.message}`)
+      }
+
+      // ── Email Delivery ──────────────────────────────────────────────────────
+      if (canSendEmail && recipientEmail) {
+        const { data: projectData } = await supabase
+          .from('projects')
+          .select('name')
+          .eq('id', batchJob.project_id)
+          .single()
+          
+        const { data: urlData } = supabase.storage
+          .from(STORAGE_BUCKET)
+          .getPublicUrl(storagePath)
+
+        await sendCertificateEmail(
+          recipientEmail,
+          recipientName,
+          achievement,
+          verificationUrl,
+          urlData?.publicUrl || '',
+          projectData?.name || 'CertiDraft'
+        )
       }
 
       processedCount++
