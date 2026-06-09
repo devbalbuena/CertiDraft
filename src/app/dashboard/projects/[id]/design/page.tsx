@@ -24,6 +24,7 @@ export default async function DesignPage({ params }: { params: Promise<{ id: str
     .single()
 
   if (error || !project) {
+    console.error('Project query failed on design page:', { id, userId: user.id, error, project })
     notFound()
   }
 
