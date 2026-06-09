@@ -54,9 +54,8 @@ export function BuilderPropertiesPanel() {
     if (!canvas || !selectedElement) return
     selectedElement.set(key as any, value)
     canvas.requestRenderAll()
-    // Need a tiny delay for history to pick up the updated state reliably
     setTimeout(() => {
-      pushHistory(JSON.stringify(canvas.toJSON(['isQRCode'])))
+      pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
     }, 50)
   }
 

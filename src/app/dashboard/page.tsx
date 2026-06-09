@@ -171,8 +171,9 @@ export default async function DashboardPage() {
               </TableHeader>
               <TableBody>
                 {recentBatches.map((batch) => {
-                  const projectName =
-                    (batch.projects as { name: string } | null)?.name ?? 'Untitled'
+                  const projectName = Array.isArray(batch.projects)
+                    ? (batch.projects[0]?.name ?? 'Untitled')
+                    : ((batch.projects as { name: string } | null)?.name ?? 'Untitled')
                   const createdAt = new Date(batch.created_at).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',

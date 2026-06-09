@@ -115,11 +115,24 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </TabsContent>
 
         <TabsContent value="upload" className="mt-0">
-          <EmptyState
-            title="CSV upload coming in Phase 7"
-            description="You will be able to upload recipient lists and map data fields to your template variables here."
-            icon={Hammer}
-          />
+          <div className="max-w-lg">
+            <Card>
+              <CardHeader>
+                <CardTitle>Upload Recipients</CardTitle>
+                <CardDescription>
+                  Upload a CSV file containing your recipient data. You can map your CSV columns
+                  to the variables you used in your certificate design.
+                </CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Button asChild>
+                  <Link href={`/dashboard/projects/${project.id}/upload`}>
+                    Start CSV Upload Wizard
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="design" className="mt-0">
@@ -159,11 +172,24 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </TabsContent>
 
         <TabsContent value="generate" className="mt-0">
-          <EmptyState
-            title="Batch generation coming in Phase 7"
-            description="Run batch jobs, preview generated certificates, and monitor progress here."
-            icon={Hammer}
-          />
+          <div className="max-w-lg">
+            <Card>
+              <CardHeader>
+                <CardTitle>Batch Generation</CardTitle>
+                <CardDescription>
+                  Generate certificates in bulk. First upload your recipient data via the Upload Data tab,
+                  and the generation process will start automatically after mapping fields.
+                </CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Button variant="secondary" asChild>
+                  <Link href={`/dashboard/projects/${project.id}/upload`}>
+                    Go to Upload Data
+                  </Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

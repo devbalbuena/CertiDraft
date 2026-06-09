@@ -89,7 +89,8 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
       newZoom *= 0.999 ** delta
       if (newZoom > 3) newZoom = 3
       if (newZoom < 0.5) newZoom = 0.5
-      canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, newZoom)
+      // zoomToPoint requires a fabric.Point, not a plain {x,y} object
+      canvas.zoomToPoint(new fabric.Point(opt.e.offsetX, opt.e.offsetY), newZoom)
       opt.e.preventDefault()
       opt.e.stopPropagation()
     })
@@ -131,12 +132,20 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
 
+    // TPointerEvent can be MouseEvent | TouchEvent. Extract coordinates safely.
+    const getEventXY = (e: MouseEvent | TouchEvent): { x: number; y: number } => {
+      if ('clientX' in e) return { x: e.clientX, y: e.clientY }
+      const touch = (e as TouchEvent).touches[0] || (e as TouchEvent).changedTouches[0]
+      return { x: touch?.clientX ?? 0, y: touch?.clientY ?? 0 }
+    }
+
     canvas.on('mouse:down', function (opt) {
       if (isSpaceDown) {
         isDragging = true
         canvas.selection = false
-        lastPosX = opt.e.clientX
-        lastPosY = opt.e.clientY
+        const { x, y } = getEventXY(opt.e as MouseEvent | TouchEvent)
+        lastPosX = x
+        lastPosY = y
       }
     })
 
@@ -144,11 +153,12 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
       if (isDragging) {
         const vpt = canvas.viewportTransform
         if (vpt) {
-          vpt[4] += opt.e.clientX - lastPosX
-          vpt[5] += opt.e.clientY - lastPosY
+          const { x, y } = getEventXY(opt.e as MouseEvent | TouchEvent)
+          vpt[4] += x - lastPosX
+          vpt[5] += y - lastPosY
           canvas.requestRenderAll()
-          lastPosX = opt.e.clientX
-          lastPosY = opt.e.clientY
+          lastPosX = x
+          lastPosY = y
         }
       }
     })
@@ -156,7 +166,8 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
     canvas.on('mouse:up', function () {
       if (isDragging) {
         const vpt = canvas.viewportTransform
-        if (vpt) canvas.setViewportTransform(vpt)
+        // setViewportTransform expects a 6-tuple TMat2D
+        if (vpt) canvas.setViewportTransform(vpt as fabric.TMat2D)
         isDragging = false
         canvas.selection = true
       }
@@ -177,7 +188,7 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
   React.useEffect(() => {
     const canvas = useCanvasStore.getState().canvas
     if (canvas && canvas.getZoom() !== zoom) {
-      canvas.zoomToPoint({ x: canvas.width! / 2, y: canvas.height! / 2 }, zoom)
+      canvas.zoomToPoint(new fabric.Point(canvas.width! / 2, canvas.height! / 2), zoom)
     }
   }, [zoom])
 

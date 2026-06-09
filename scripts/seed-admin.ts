@@ -21,7 +21,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
     persistSession: false
   },
   realtime: {
-    transport: ws
+    transport: ws as any
   }
 })
 

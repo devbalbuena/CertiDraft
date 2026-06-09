@@ -102,25 +102,29 @@ export function BuilderLayersPanel() {
     canvas.discardActiveObject()
     setSelectedElement(null)
     canvas.requestRenderAll()
-    pushHistory(JSON.stringify(canvas.toJSON(['isQRCode'])))
+    pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
   }
 
   const moveUp = (obj: fabric.Object, e: React.MouseEvent) => {
     e.stopPropagation()
     if (!canvas) return
+    // In Fabric v7, bringObjectForward operates on the active object
+    canvas.setActiveObject(obj)
     canvas.bringObjectForward(obj)
     canvas.requestRenderAll()
     refreshObjects()
-    pushHistory(JSON.stringify(canvas.toJSON(['isQRCode'])))
+    pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
   }
 
   const moveDown = (obj: fabric.Object, e: React.MouseEvent) => {
     e.stopPropagation()
     if (!canvas) return
+    // In Fabric v7, sendObjectBackwards operates on the active object
+    canvas.setActiveObject(obj)
     canvas.sendObjectBackwards(obj)
     canvas.requestRenderAll()
     refreshObjects()
-    pushHistory(JSON.stringify(canvas.toJSON(['isQRCode'])))
+    pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
   }
 
   return (

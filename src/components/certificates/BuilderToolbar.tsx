@@ -165,26 +165,25 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
   // ── Actions ─────────────────────────────────────────────────────────────
   const handleSave = () => {
     if (!canvas) return
-    const json = JSON.stringify(canvas.toJSON(['isQRCode']))
+    const json = JSON.stringify((canvas as any).toJSON(['isQRCode']))
     onSave(json)
   }
 
   const handlePreview = () => {
     if (!canvas) return
-    // Reset zoom and viewport temporarily to get a clean export
     const originalZoom = canvas.getZoom()
-    const originalVpt = [...canvas.viewportTransform!]
-    canvas.setViewportTransform([1, 0, 0, 1, 0, 0])
-    
+    const originalVpt = [...canvas.viewportTransform!] as fabric.TMat2D
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0] as fabric.TMat2D)
+
     const dataURL = canvas.toDataURL({
       format: 'png',
       quality: 1,
       multiplier: 1,
     })
-    
+
     canvas.setViewportTransform(originalVpt)
     canvas.setZoom(originalZoom)
-    
+
     const win = window.open('')
     if (win) {
       win.document.write(`<img src="${dataURL}" alt="Preview" style="max-width: 100%; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1);" />`)
