@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ['puppeteer', 'puppeteer-core'],
+  experimental: {
+    serverComponentsExternalPackages: ['@google/generative-ai']
+  }
 };
 
 export default nextConfig;
