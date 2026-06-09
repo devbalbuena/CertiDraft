@@ -101,6 +101,18 @@ export default function SubscriptionPage() {
     })
   }
 
+  const simulateUpgrade = async (planId: PlanType) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { error } = await supabase.from('users').update({ plan: planId }).eq('id', user.id)
+    if (error) {
+      toast.error('Failed to simulate upgrade')
+    } else {
+      toast.success(`Simulated upgrade to ${planId} plan for testing!`)
+      setCurrentPlan(planId)
+    }
+  }
+
   if (isLoading) {
     return <div className="flex justify-center p-10"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
   }
@@ -184,7 +196,7 @@ export default function SubscriptionPage() {
                 </ul>
               </CardContent>
               
-              <CardFooter>
+              <CardFooter className="flex flex-col gap-2">
                 <Button 
                   variant={isActive ? 'outline' : plan.popular ? 'default' : 'secondary'} 
                   className="w-full"
@@ -193,6 +205,15 @@ export default function SubscriptionPage() {
                 >
                   {isActive ? 'Active' : 'Upgrade'}
                 </Button>
+                {process.env.NODE_ENV === 'development' && !isActive && (
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-dashed text-xs h-8 text-muted-foreground"
+                    onClick={() => simulateUpgrade(plan.id)}
+                  >
+                    Simulate {plan.name} (Dev)
+                  </Button>
+                )}
               </CardFooter>
             </Card>
           )

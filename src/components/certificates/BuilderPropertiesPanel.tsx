@@ -44,8 +44,33 @@ export function BuilderPropertiesPanel() {
 
   if (!selectedElement) {
     return (
-      <div className="w-[280px] border-l border-border bg-card p-6 flex flex-col shrink-0 text-center text-sm text-muted-foreground items-center justify-center">
-        Select an element to edit its properties.
+      <div className="w-[280px] border-l border-border bg-card p-6 flex flex-col shrink-0 gap-6 overflow-y-auto">
+        <div className="flex items-center justify-between pb-2 border-b border-border">
+          <h3 className="font-semibold text-sm">Canvas Document</h3>
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Background Color</Label>
+          <div className="flex items-center gap-3">
+            <Input 
+              type="color" 
+              value={canvas?.backgroundColor?.toString() || '#ffffff'}
+              onChange={(e) => {
+                if (!canvas) return
+                canvas.backgroundColor = e.target.value
+                canvas.requestRenderAll()
+              }}
+              onBlur={() => {
+                if (!canvas) return
+                pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
+              }}
+              className="p-1 h-9 w-full"
+            />
+          </div>
+        </div>
+        <div className="flex-1" />
+        <p className="text-xs text-muted-foreground text-center">
+          Select an element on the canvas to edit its properties.
+        </p>
       </div>
     )
   }
@@ -59,18 +84,19 @@ export function BuilderPropertiesPanel() {
     }, 50)
   }
 
-  const type = selectedElement.type
+  const type = selectedElement.type?.toLowerCase() || ''
+  const displayType = selectedElement.type
 
   // We define getters carefully for the active object
-  const isText = type === 'FabricText' || type === 'Text' || type === 'i-text' || type === 'textbox'
-  const isShape = type === 'Rect' || type === 'Circle' || type === 'Ellipse' || type === 'Triangle'
+  const isText = type === 'fabrictext' || type === 'text' || type === 'i-text' || type === 'textbox'
+  const isShape = type === 'rect' || type === 'circle' || type === 'ellipse' || type === 'triangle'
 
   return (
     <div className="w-[280px] border-l border-border bg-card p-4 flex flex-col gap-6 shrink-0 overflow-y-auto">
       <div className="flex items-center justify-between pb-2 border-b border-border">
         <h3 className="font-semibold text-sm">Properties</h3>
         <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
-          {type}
+          {displayType}
         </span>
       </div>
 
@@ -231,7 +257,7 @@ export function BuilderPropertiesPanel() {
             />
           </div>
 
-          {type === 'Rect' && (
+          {type === 'rect' && (
             <div className="space-y-1.5">
               <Label className="text-xs">Corner Radius (px)</Label>
               <Input 
@@ -247,6 +273,42 @@ export function BuilderPropertiesPanel() {
           )}
         </div>
       )}
+
+      <div className="space-y-1.5 pt-4 border-t border-border mt-auto">
+        <Label className="text-xs">Layer Order</Label>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs h-8"
+            onClick={() => {
+              if (!canvas || !selectedElement) return
+              // In fabric v7 sendObjectToBack works on active object
+              canvas.setActiveObject(selectedElement)
+              canvas.sendObjectToBack(selectedElement)
+              canvas.requestRenderAll()
+              pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
+            }}
+          >
+            Send to Back
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full text-xs h-8"
+            onClick={() => {
+              if (!canvas || !selectedElement) return
+              // In fabric v7 bringObjectToFront works on active object
+              canvas.setActiveObject(selectedElement)
+              canvas.bringObjectToFront(selectedElement)
+              canvas.requestRenderAll()
+              pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
+            }}
+          >
+            Bring to Front
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
