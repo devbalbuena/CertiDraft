@@ -1,51 +1,181 @@
 # CertiDraft
 
-CertiDraft is a modern, high-performance web application designed for creating, managing, and batch-generating custom certificates. Built with Next.js 16 (App Router), Supabase, and Fabric.js, it offers a seamless experience from user authentication to advanced drag-and-drop certificate design.
+## Overview
+CertiDraft is a comprehensive, full-stack certificate generation platform designed to streamline the creation, issuance, and verification of professional credentials. Built for educators, event organizers, and institutions, it solves the tedious problem of manual certificate creation by offering a powerful drag-and-drop designer, bulk CSV data mapping, AI-generated citations, and automated email delivery. Every certificate issued is cryptographically verifiable via a unique public URL.
 
-## 🚀 Progress Summary (What's Built So Far)
+## Live Demo
+[Live Demo](Not yet deployed)
 
-The system has been built out in several structured phases. Here is a breakdown of the currently implemented features and architecture:
+## Screenshots
+![Main Page](./screenshots/main.png)
+![Dashboard](./screenshots/dashboard.png)
+*(Add your screenshots to a `/screenshots` folder in the root)*
 
-### 1. Core Architecture & Tech Stack
-- **Framework:** Next.js 16 (App Router) with Turbopack for lightning-fast development.
-- **Language:** TypeScript.
-- **Styling:** Tailwind CSS with a comprehensive suite of accessible UI components from **Shadcn UI** (Buttons, Cards, Dialogs, Dropdowns, Tabs, Sliders, etc.).
-- **Database & Auth:** Supabase (PostgreSQL) with Server-Side Rendering (SSR) client integration.
-- **State Management:** Zustand for lightweight, cross-component state (specifically used in the Certificate Builder).
-- **Canvas Rendering:** Fabric.js v7 for robust, interactive 2D canvas manipulation.
+## Features
 
-### 2. Authentication & Authorization
-- **Supabase Auth Integration:** Full user authentication flow using Supabase SSR packages.
-- **Role-Based Access Control (RBAC):** Users are assigned roles (e.g., `admin`, `user`).
-- **Route Guards:** Implementation of robust route protection mechanisms (`AdminRouteGuard`) to ensure administrative pages are only accessible to authorized users.
+**Authentication & Profiles**
+- Email & password sign up / login via Supabase Auth
+- Secure password recovery flow
+- Profile management (Full Name, Avatar URL)
 
-### 3. User Dashboard
-- **Dashboard Home:** Displays real-time statistics for the user, including total certificates generated, monthly limits, current subscription plan, and recent batch generation jobs.
-- **Project Management:** Complete CRUD capabilities for certificate projects. Users can create new campaigns, view project details, and delete projects.
-- **Project Workflows:** A tabbed interface for managing a project's lifecycle: Overview, Upload Data, Design Template, and Generate.
-- **Navigation:** Responsive Sidebar and Topbar with user profile management and breadcrumb navigation (intelligently handling UUIDs).
+**Project Management**
+- Create and organize isolated certificate projects
+- Track generated certificate counts and project statuses
+- Global templates gallery for quick starts
 
-### 4. Admin Panel
-- **Admin Layout:** A dedicated layout and sidebar specifically for system administrators.
-- **Management Views:** Interfaces set up for overseeing system Analytics, User Management, Global Templates, Billing, and Global Settings.
+**Certificate Designer**
+- Advanced drag-and-drop canvas powered by Fabric.js
+- Support for Text, Shapes (Rectangles, Circles), Images, and QR Codes
+- Dynamic variable injection (e.g., `{{recipient_name}}`, `{{achievement}}`)
+- Comprehensive properties panel (fonts, colors, alignment, corner radius, opacity)
+- Layer ordering (Bring to Front, Send to Back) and Canvas background color controls
+- Zoom, pan, undo, redo, and preview capabilities
 
-### 5. Advanced Certificate Builder (Fabric.js)
-The core feature of CertiDraft is the custom drag-and-drop certificate designer, which allows users to visually build their certificate templates.
-- **Client-Side Rendering:** The builder is dynamically imported (`ssr: false`) to ensure compatibility with Fabric.js, which requires the browser DOM.
-- **Interactive Canvas (`CertificateCanvas`):** Supports zooming, panning (Space + Drag), object selection, and inline text editing. Built-in safeguards protect against React Strict Mode rendering issues.
-- **Toolbar (`BuilderToolbar`):** Allows users to add editable Text, Rectangles, Circles, Images, and placeholder QR Codes. Includes Undo/Redo history tracking, zoom controls, and design saving/previewing.
-- **Properties Panel (`BuilderPropertiesPanel`):** Context-aware right panel that updates based on the selected element. Users can change text content, fonts, colors, alignment, styles (bold/italic), and shape properties (stroke, fill, opacity, corner radius).
-- **Layers Panel (`BuilderLayersPanel`):** Left panel providing a Photoshop-style view of all canvas elements, allowing users to reorder (move up/down), select, and delete objects.
-- **Variable Integration:** Users can insert template variables (e.g., `{{recipient_name}}`, `{{issued_date}}`) which will be replaced with real data during the batch generation phase.
-- **Auto-Save & Persistence:** Designs are serialized to JSON and securely saved to the Supabase `projects` table via dedicated API routes (`PATCH /api/projects/[id]/design`).
+**Data Upload & Mapping**
+- 4-step interactive CSV upload wizard (using PapaParse)
+- Intelligent column mapping from CSV to certificate variables
+- Data preview table before initiating generation
 
-### 6. API & Database Integrity
-- **API Routes:** Secure Next.js API route handlers validating user sessions and ownership before allowing data mutations (e.g., deleting a project or saving a design).
-- **RLS Policies:** Row Level Security implemented in Supabase to ensure users can only access and modify their own data.
+**AI Citation Generation**
+- Integration with Google's Gemini 2.0 Flash (`@google/generative-ai`)
+- Automatically generates personalized 2-3 sentence professional citations based on recipient name, achievement, and tone
 
-## 🔜 Next Steps
+**Batch Processing Worker**
+- Robust background worker using BullMQ and Redis
+- Headless Puppeteer rendering of Fabric.js canvas to pixel-perfect PDFs
+- Automatic upload of generated PDFs to Supabase Storage
+- Real-time job status tracking
 
-The upcoming phases will focus on the final steps of the certificate lifecycle:
-1. **Data Upload & Mapping (Phase 7):** Allowing users to upload CSV files of recipients and map columns to the design variables.
-2. **Batch Generation Engine:** Processing the template and the data to generate hundreds of personalized PDF/Image certificates in the background.
-3. **Delivery & Export:** Allowing users to download the generated batches or potentially email them directly to recipients.
+**Verification & Wallets**
+- Unique public verification page for every issued certificate (`/verify/[token]`)
+- Public user wallets showcasing all certificates earned by an email (`/wallet/[slug]`)
+- Privacy toggles for public/private wallets
+- 1-click social sharing to LinkedIn
+
+**Email Delivery**
+- Automated certificate dispatch via Resend
+- Custom branded HTML email templates
+- Direct download and verification links included in emails
+
+**Billing & Subscriptions**
+- Four-tier system: Free, Starter, Pro, and Enterprise
+- Monthly usage tracking and hard limits
+- Feature gating (e.g., AI Citations and Email Delivery restricted to paid plans)
+
+**Admin & Security**
+- Role-based access control (RBAC) Admin panel
+- Row Level Security (RLS) policies enforced via Supabase
+
+## Tech Stack
+
+| Category       | Technology |
+|----------------|------------|
+| Frontend       | Next.js (App Router), React, Tailwind CSS, Shadcn UI, Fabric.js, Zustand |
+| Backend        | Next.js Route Handlers, Node.js (Worker), BullMQ, Puppeteer |
+| Database       | Supabase (PostgreSQL), Redis (Upstash) |
+| Authentication | Supabase Auth |
+| Styling        | Tailwind CSS (v4), Lucide React |
+| Deployment     | Vercel (Frontend), Railway (Worker) |
+| Build Tool     | npm, TypeScript |
+
+## Project Structure
+
+```text
+src/
+├── app/                  # Next.js App Router pages and API routes
+│   ├── api/              # Backend API endpoints (projects, batch, users, ai)
+│   ├── auth/             # Login, signup, reset password pages
+│   ├── dashboard/        # Main user dashboard, project management, settings, subscription
+│   ├── verify/           # Public certificate verification pages
+│   └── wallet/           # Public user certificate showcase wallets
+├── components/           # Reusable React components
+│   ├── certificates/     # Certificate designer, properties panel, toolbar, layers
+│   ├── layout/           # Sidebar, topbar, page headers
+│   ├── ui/               # Shadcn UI primitives
+│   └── uploads/          # CSV upload, mapping, and generation wizard
+├── context/              # React Context providers (AuthContext)
+└── lib/                  # Utilities, Supabase clients, queue config, subscriptions
+workers/                  # Node.js background worker processes
+```
+
+## Database Schema
+
+- **`users`**
+  - Columns: `id`, `email`, `full_name`, `avatar_url`, `plan`, `certificates_this_month`, `role`, `wallet_slug`, `wallet_title`, `wallet_is_public`
+  - Purpose: Stores user profiles, active subscription limits, and public wallet configuration.
+- **`projects`**
+  - Columns: `id`, `user_id`, `name`, `description`, `event_type`, `elements`, `certificate_count`, `status`, `template_id`
+  - Purpose: Represents a campaign. Links to the user and stores the JSON definition of the certificate design.
+- **`batch_jobs`**
+  - Columns: `id`, `project_id`, `status`, `total_count`, `processed_count`, `csv_data`, `mapping`
+  - Purpose: Tracks the status and progress of bulk generation jobs triggered by CSV uploads.
+- **`certificates`**
+  - Columns: `id`, `user_id`, `project_id`, `recipient_name`, `recipient_email`, `achievement`, `grade`, `issued_date`, `verification_token`, `storage_path`, `storage_bucket`, `last_email_sent_at`
+  - Purpose: Stores individual issued certificates, verification tokens, and Supabase Storage paths.
+- **`templates`**
+  - Columns: `id`, `name`, `description`, `elements`, `thumbnail_url`
+  - Purpose: Global predefined templates that users can clone into their own projects.
+
+## Local Setup Instructions
+
+### Prerequisites
+- Node.js 20+
+- npm
+- Supabase account (for PostgreSQL, Auth, and Storage)
+- Redis instance (e.g., Upstash)
+- Resend API Key
+- Google Gemini API Key
+
+### Installation Steps
+1. Clone the repository and navigate into it.
+2. Install the dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up your environment variables by creating a `.env.local` file (see below).
+4. Start the Next.js development server:
+   ```bash
+   npm run dev
+   ```
+5. Open a second terminal and start the background worker:
+   ```bash
+   npm run worker:certificates
+   ```
+
+### Environment Variables
+
+Create a `.env.local` file in the root of the project:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=Your Supabase project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=Your Supabase public anon key
+SUPABASE_SERVICE_ROLE_KEY=Your Supabase service role key (for admin actions)
+REDIS_URL=Your Redis connection string (must start with rediss://)
+RESEND_API_KEY=Your Resend API key for sending emails
+GEMINI_API_KEY=Your Google Gemini API key for generating AI citations
+NEXT_PUBLIC_SITE_URL=The base URL of the site (e.g., http://localhost:3000)
+SUPABASE_CERTIFICATES_BUCKET=Name of the public storage bucket (e.g., certificates)
+```
+
+## Deployment
+
+CertiDraft consists of two main components that must be deployed separately:
+
+1. **Frontend (Vercel)**
+   - Connect your repository to Vercel.
+   - The `vercel.json` file automatically configures the correct max durations.
+   - The `next.config.ts` prevents heavy Node.js dependencies (Puppeteer) from bundling into Vercel's edge network.
+   - Add all environment variables to the Vercel project settings. Ensure `NEXT_PUBLIC_SITE_URL` matches your new production URL.
+
+2. **Background Worker (Railway / Render)**
+   - Connect the same repository to a persistent host like Railway.
+   - The included `railway.json` and `Procfile` define the build and start commands (`npm run worker:certificates`).
+   - Add the exact same environment variables to the Railway project.
+
+## Author
+Ivan Lee Balbuena  
+3rd Year IT Student — Caraga State University  
+Open to freelance: Full-Stack · UI/UX · AI Projects
+
+## License
+MIT License
