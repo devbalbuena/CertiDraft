@@ -112,7 +112,9 @@ export function Sidebar() {
       {/* ── Primary Navigation ───────────────────────────────────────────── */}
       <div className="flex-1 overflow-y-auto py-6 flex flex-col gap-1 px-3">
         {PRIMARY_NAV.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+        const isActive = item.href === '/dashboard'
+          ? pathname === '/dashboard'
+          : pathname === item.href || pathname.startsWith(`${item.href}/`)
           return (
             <Link
               key={item.href}

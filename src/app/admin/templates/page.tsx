@@ -1,16 +1,29 @@
-import { PageHeader } from '@/components/layout/PageHeader'
-import { EmptyState } from '@/components/layout/EmptyState'
-import { Hammer } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { AdminTemplatesClient } from './AdminTemplatesClient'
 
-export default function AdminTemplatesPage() {
-  return (
-    <>
-      <PageHeader title="Global Templates" subtitle="Manage default templates available to all users." />
-      <EmptyState
-        title="Coming Soon"
-        description="The global templates management interface is currently under construction."
-        icon={Hammer}
-      />
-    </>
-  )
+export default async function AdminTemplatesPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) redirect('/auth/login')
+
+  // Verify admin role
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') redirect('/dashboard')
+
+  // Fetch all templates with creator info using admin client (bypasses RLS)
+  const adminSupabase = createAdminClient()
+  const { data: templates } = await adminSupabase
+    .from('templates')
+    .select('*, users(email)')
+    .order('created_at', { ascending: false })
+
+  return <AdminTemplatesClient templates={templates ?? []} />
 }
