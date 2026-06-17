@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -36,7 +36,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const adminSupabase = createAdminClient()
+  const adminSupabase = supabaseAdmin
   const { data, error } = await adminSupabase
     .from('templates')
     .select('*, users(email)')
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
-  const adminSupabase = createAdminClient()
+  const adminSupabase = supabaseAdmin
   const { data, error } = await adminSupabase
     .from('templates')
     .insert({

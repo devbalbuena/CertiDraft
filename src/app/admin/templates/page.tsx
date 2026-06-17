@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { AdminTemplatesClient } from './AdminTemplatesClient'
 
 export default async function AdminTemplatesPage() {
@@ -19,7 +19,7 @@ export default async function AdminTemplatesPage() {
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   // Fetch all templates with creator info using admin client (bypasses RLS)
-  const adminSupabase = createAdminClient()
+  const adminSupabase = supabaseAdmin
   const { data: templates } = await adminSupabase
     .from('templates')
     .select('*, users(email)')

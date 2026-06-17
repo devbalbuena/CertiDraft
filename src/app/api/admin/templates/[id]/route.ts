@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
@@ -46,7 +46,7 @@ export async function PATCH(
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
-  const adminSupabase = createAdminClient()
+  const adminSupabase = supabaseAdmin
   const { data, error } = await adminSupabase
     .from('templates')
     .update(parsed.data)
@@ -71,7 +71,7 @@ export async function DELETE(
   }
 
   const { id } = await params
-  const adminSupabase = createAdminClient()
+  const adminSupabase = supabaseAdmin
   const { error } = await adminSupabase
     .from('templates')
     .delete()
