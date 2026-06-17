@@ -173,8 +173,8 @@ CertiDraft consists of two main components that must be deployed separately:
    - Add the exact same environment variables to the Railway project.
 
 ## Author
-Ivan Lee Balbuena  
-3rd Year IT Student — Caraga State University  
+Dexter Balbuena
+3rd Year IT Student — FSUU University
 Open to freelance: Full-Stack · UI/UX · AI Projects
 
 ## License
