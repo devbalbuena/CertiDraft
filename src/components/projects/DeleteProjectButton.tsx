@@ -47,7 +47,7 @@ export function DeleteProjectButton({ projectId, projectName }: { projectId: str
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive/10 border-destructive/20">
+        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-red-600 hover:bg-red-50 h-8 w-8 transition-colors">
           <Trash2 className="h-4 w-4" />
           <span className="sr-only">Delete project</span>
         </Button>
