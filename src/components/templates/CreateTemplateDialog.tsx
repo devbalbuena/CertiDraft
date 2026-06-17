@@ -26,7 +26,7 @@ const schema = z.object({
   accent_color: z.string().min(1, 'Accent color is required'),
   secondary_color: z.string().min(1, 'Secondary color is required'),
   style: z.string().optional(),
-  is_featured: z.boolean().default(false),
+  is_featured: z.boolean(),
 })
 
 type FormValues = z.infer<typeof schema>
