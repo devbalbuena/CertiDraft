@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StatCard } from '@/components/layout/StatCard'
 import { EmptyState } from '@/components/layout/EmptyState'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -20,6 +19,7 @@ import {
   CreditCard,
   FolderOpen,
   Inbox,
+  ArrowRight,
 } from 'lucide-react'
 
 // ── Plan limits lookup ────────────────────────────────────────────────────────
@@ -35,33 +35,33 @@ function BatchStatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; className: string }> = {
     completed: {
       label: 'Completed',
-      className: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      className: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
     },
     completed_with_errors: {
       label: 'Partial',
-      className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      className: 'bg-amber-50 text-amber-700 border border-amber-200/60',
     },
     processing: {
       label: 'Processing',
-      className: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      className: 'bg-blue-50 text-blue-700 border border-blue-200/60',
     },
     retrying: {
       label: 'Retrying',
-      className: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      className: 'bg-amber-50 text-amber-700 border border-amber-200/60',
     },
     failed: {
       label: 'Failed',
-      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      className: 'bg-red-50 text-red-700 border border-red-200/60',
     },
     pending: {
       label: 'Pending',
-      className: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400',
+      className: 'bg-slate-100 text-slate-700 border border-slate-200/60',
     },
   }
   const config = map[status] ?? map.pending
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${config.className}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide uppercase ${config.className}`}
     >
       {config.label}
     </span>
@@ -108,6 +108,9 @@ export default async function DashboardPage() {
   const plan = profile?.plan ?? 'free'
   const usedThisMonth = profile?.certificates_this_month ?? 0
   const planLimit = PLAN_LIMITS[plan] ?? 5
+  
+  // Calculate progress percentage, capped at 100
+  const progressPercentage = Math.min((usedThisMonth / planLimit) * 100, 100)
 
   return (
     <div>
@@ -117,7 +120,7 @@ export default async function DashboardPage() {
       />
 
       {/* ── Stats row ────────────────────────────────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
         <StatCard
           label="Total Certificates"
           value={totalCerts ?? 0}
@@ -128,12 +131,29 @@ export default async function DashboardPage() {
           label="This Month"
           value={`${usedThisMonth} / ${planLimit}`}
           icon={CalendarDays}
-        />
+        >
+          {/* Progress Bar for This Month */}
+          <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+             <div 
+               className={`h-full rounded-full ${progressPercentage >= 100 ? 'bg-red-500' : 'bg-blue-500'}`} 
+               style={{ width: `${progressPercentage}%` }}
+             ></div>
+          </div>
+        </StatCard>
         <StatCard
           label="Current Plan"
           value={plan.charAt(0).toUpperCase() + plan.slice(1)}
           icon={CreditCard}
-        />
+        >
+          {/* Upgrade Link for Current Plan */}
+          <Link 
+            href="/dashboard/subscription" 
+            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors group"
+          >
+            Upgrade plan 
+            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </StatCard>
         <StatCard
           label="Projects"
           value={totalProjects ?? 0}
@@ -144,7 +164,7 @@ export default async function DashboardPage() {
 
       {/* ── Recent Activity ───────────────────────────────────────────────── */}
       <div>
-        <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight mb-4">Recent Activity</h2>
 
         {!recentBatches || recentBatches.length === 0 ? (
           <EmptyState
@@ -152,21 +172,21 @@ export default async function DashboardPage() {
             description="Create a project and upload a CSV file to generate your first batch of certificates."
             icon={Inbox}
             action={
-              <Button asChild>
+              <Button asChild className="bg-blue-600 hover:bg-blue-700 rounded-full">
                 <Link href="/dashboard/projects">Create your first project</Link>
               </Button>
             }
           />
         ) : (
-          <div className="rounded-xl border border-border/40 bg-card overflow-hidden">
+          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
             <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Project</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Progress</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+              <TableHeader className="bg-slate-50/50">
+                <TableRow className="hover:bg-transparent border-slate-200">
+                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Project</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Status</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Progress</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Created</TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -180,17 +200,17 @@ export default async function DashboardPage() {
                     year: 'numeric',
                   })
                   return (
-                    <TableRow key={batch.id}>
-                      <TableCell className="font-medium">{projectName}</TableCell>
-                      <TableCell>
+                    <TableRow key={batch.id} className="border-slate-100 hover:bg-slate-50/50 transition-colors">
+                      <TableCell className="font-semibold text-slate-900 py-4">{projectName}</TableCell>
+                      <TableCell className="py-4">
                         <BatchStatusBadge status={batch.status} />
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-slate-500 font-medium text-sm py-4">
                         {batch.processed_count} / {batch.total_count}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{createdAt}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" asChild>
+                      <TableCell className="text-slate-500 text-sm py-4">{createdAt}</TableCell>
+                      <TableCell className="text-right py-4">
+                        <Button variant="outline" size="sm" className="h-8 text-xs font-medium text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900" asChild>
                           <Link href={`/dashboard/projects`}>View</Link>
                         </Button>
                       </TableCell>

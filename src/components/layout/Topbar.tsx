@@ -29,7 +29,6 @@ export function Topbar() {
   const segments = pathname.split('/').filter(Boolean)
   let currentSegment = segments[segments.length - 1] || 'Overview'
   
-  // If the segment looks like a UUID, rename it to "Project"
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(currentSegment)
   if (isUUID) {
     currentSegment = 'Project'
@@ -38,20 +37,19 @@ export function Topbar() {
   const title = currentSegment.charAt(0).toUpperCase() + currentSegment.slice(1)
 
   return (
-    <header className="h-16 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-30 sticky top-0 px-4 flex items-center justify-between gap-4">
+    <header className="h-16 border-b border-slate-200 bg-white z-30 sticky top-0 px-4 md:px-6 flex items-center justify-between gap-4">
       
       {/* Mobile Menu Trigger & Breadcrumb */}
       <div className="flex items-center gap-4">
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="-ml-2">
+              <Button variant="ghost" size="icon" className="-ml-2 text-slate-500">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-[260px]">
-              {/* Render the appropriate sidebar inside the sheet for mobile */}
+            <SheetContent side="left" className="p-0 w-[260px] border-r border-slate-200">
               {isAdminArea ? (
                 <div className="flex h-full w-full [&>aside]:flex [&>aside]:w-full [&>aside]:border-none">
                   <AdminSidebar />
@@ -65,63 +63,63 @@ export function Topbar() {
           </Sheet>
         </div>
         
-        <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="hidden sm:flex items-center gap-2 text-sm text-slate-500">
           <span className="capitalize">{isAdminArea ? 'Admin' : 'Dashboard'}</span>
-          <span>/</span>
-          <span className="font-medium text-foreground">{title}</span>
+          <span className="text-slate-300">/</span>
+          <span className="font-semibold text-slate-900 tracking-tight">{title}</span>
         </div>
       </div>
 
-      {/* Search Bar (Placeholder) */}
-      <div className="flex-1 max-w-md hidden lg:flex">
-        <div className="relative w-full">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+      {/* Search Bar */}
+      <div className="flex-1 max-w-md hidden lg:flex justify-center ml-auto mr-8">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             type="search"
-            placeholder="Search certificates, templates..."
-            className="w-full bg-muted/50 pl-9 border-none focus-visible:ring-1 focus-visible:bg-background"
+            placeholder="Search..."
+            className="w-full bg-slate-50/50 pl-10 border-slate-200 focus-visible:ring-1 focus-visible:ring-blue-600 rounded-full h-9 text-sm transition-all"
           />
         </div>
       </div>
 
       {/* Right Side: Notifications & Profile */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="text-muted-foreground">
-          <Bell className="h-5 w-5" />
+        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full">
+          <Bell className="h-[18px] w-[18px]" />
           <span className="sr-only">Notifications</span>
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-              <Avatar className="h-8 w-8 border border-border">
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full ml-1 ring-1 ring-slate-200 ring-offset-2 ring-offset-white hover:ring-slate-300">
+              <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.user_metadata?.avatar_url || ''} alt="Avatar" />
-                <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                <AvatarFallback className="bg-blue-50 text-blue-700 text-xs font-semibold">
                   {user?.email?.charAt(0).toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
-            <DropdownMenuLabel className="font-normal">
+          <DropdownMenuContent className="w-56 rounded-xl border border-slate-200 shadow-lg" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal p-3">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-sm font-semibold text-slate-900 leading-none">
                   {user?.user_metadata?.full_name || 'User'}
                 </p>
-                <p className="text-xs leading-none text-muted-foreground">
+                <p className="text-xs leading-none text-slate-500">
                   {user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <a href="/settings">Profile Settings</a>
+            <DropdownMenuSeparator className="bg-slate-100" />
+            <DropdownMenuItem className="text-slate-700 focus:bg-slate-50 focus:text-slate-900 cursor-pointer" asChild>
+              <a href="/dashboard/settings">Profile Settings</a>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem className="text-slate-700 focus:bg-slate-50 focus:text-slate-900 cursor-pointer" asChild>
               <a href="/dashboard/subscription">Billing</a>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut()} className="text-destructive focus:text-destructive cursor-pointer">
+            <DropdownMenuSeparator className="bg-slate-100" />
+            <DropdownMenuItem onClick={() => signOut()} className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer font-medium">
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
