@@ -1,6 +1,10 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Playfair_Display } from 'next/font/google'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Card,
   CardHeader,
@@ -9,16 +13,32 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card'
-import { Check, ChevronRight, Award } from 'lucide-react'
+import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Send } from 'lucide-react'
 
 // Load the serif font for headings
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700', '800'] })
 
+// Logos for infinite marquee
+const LOGOS = [
+  "Acme Corp", "GlobalTech", "Pied Piper", "Hooli", "Initech", "Stark Ind.", "Wayne Ent.", "Umbrella Corp", "Massive Dynamic"
+]
+
 export default function LandingPage() {
+  const [activeTab, setActiveTab] = useState(0)
+  const [sliderPosition, setSliderPosition] = useState(50)
+  
+  const tabs = [
+    { title: "1. Design", icon: Layout, desc: "Drag and drop builder" },
+    { title: "2. Map Data", icon: FileText, desc: "Upload CSV rows" },
+    { title: "3. Generate", icon: Zap, desc: "Create 1000s instantly" },
+    { title: "4. Automate", icon: Send, desc: "Email automatically" },
+  ]
+
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-white selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen flex flex-col font-sans bg-slate-50 selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+      
       {/* ── Navigation Bar ────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 w-full bg-white border-b border-slate-100">
+      <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
@@ -28,198 +48,423 @@ export default function LandingPage() {
               CertiDraft
             </span>
           </div>
-
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">Features</Link>
-            <Link href="#pricing" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors">Pricing</Link>
+            <Link href="#features" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Features</Link>
+            <Link href="#how-it-works" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">How it works</Link>
+            <Link href="#pricing" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Pricing</Link>
           </div>
-
           <div className="flex items-center gap-4">
-            <Link href="/auth/login" className="hidden sm:inline-flex text-sm font-semibold text-slate-600 hover:text-slate-900">
+            <Link href="/auth/login" className="hidden sm:inline-flex text-sm font-bold text-slate-600 hover:text-slate-900">
               Log in
             </Link>
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 font-semibold shadow-sm h-10">
+            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 font-bold shadow-md transition-transform hover:scale-105 h-11">
               <Link href="/auth/signup">Get started free</Link>
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="flex-1">
-        {/* ── Hero Section ────────────────────────────────────────────────── */}
-        <section className="pt-20 pb-32 px-6 bg-slate-50 relative overflow-hidden">
-          <div className="container mx-auto max-w-6xl relative z-10">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <main className="flex-1 pt-20">
+        
+        {/* ── 1. Animated Hero Section ────────────────────────────────────── */}
+        <section className="relative pt-24 pb-32 px-6 overflow-hidden bg-white border-b border-slate-200">
+          {/* Subtle animated background gradients */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] opacity-30 pointer-events-none">
+            <motion.div 
+              animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-20 left-20 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-[100px]" 
+            />
+            <motion.div 
+              animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-40 right-20 w-96 h-96 bg-cyan-300 rounded-full mix-blend-multiply filter blur-[100px]" 
+            />
+          </div>
+
+          <div className="container mx-auto max-w-5xl relative z-10 text-center flex flex-col items-center">
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100 text-blue-700 font-bold text-xs uppercase tracking-widest mb-8 shadow-sm"
+            >
+              <Zap className="w-4 h-4" fill="currentColor" />
+              The new standard for credentials
+            </motion.div>
+
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className={`${playfair.className} text-5xl md:text-7xl font-extrabold text-slate-900 mb-8 leading-[1.1] tracking-tight max-w-4xl`}
+            >
+              Issue beautiful certificates <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">at scale.</span>
+            </motion.h1>
+
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-lg md:text-xl text-slate-600 mb-12 leading-relaxed font-medium max-w-2xl"
+            >
+              Design once, generate hundreds. CertiDraft automates your entire credential workflow — from CSV upload to verified PDF delivery in seconds.
+            </motion.p>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+            >
+              <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold shadow-xl transition-all hover:shadow-blue-500/25 hover:-translate-y-1 group" asChild>
+                <Link href="/auth/signup">
+                  Start generating free 
+                  <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── 2. Infinite Trust Band ──────────────────────────────────────── */}
+        <section className="py-12 bg-white border-b border-slate-100 overflow-hidden flex flex-col items-center">
+           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 text-center">Trusted by forward-thinking teams</p>
+           
+           <div className="relative w-full flex overflow-hidden group">
+             <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10"></div>
+             <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10"></div>
+             
+             <motion.div 
+                className="flex items-center gap-16 whitespace-nowrap px-8"
+                animate={{ x: ["0%", "-50%"] }}
+                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+             >
+                {/* Double the logos for seamless loop */}
+                {[...LOGOS, ...LOGOS].map((logo, i) => (
+                  <div key={i} className="flex items-center gap-3 opacity-40 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
+                    <div className="w-8 h-8 rounded bg-slate-200 flex items-center justify-center font-bold text-slate-500 text-xs">
+                      {logo.charAt(0)}
+                    </div>
+                    <span className="font-extrabold text-xl text-slate-800 tracking-tight">{logo}</span>
+                  </div>
+                ))}
+             </motion.div>
+           </div>
+        </section>
+
+        {/* ── 3. Bento Box Features Grid ──────────────────────────────────── */}
+        <section id="features" className="py-32 px-6 bg-slate-50">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+                Everything you need.
+              </h2>
+              <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
+                A complete toolkit to design, map, and distribute professional credentials.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
               
-              {/* Left Column: Content */}
-              <div className="flex flex-col items-start text-left max-w-xl">
-                {/* Badge */}
-                <div className="mb-6 flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
-                  <span className="text-[11px] font-bold text-slate-500 tracking-[0.15em] uppercase">
-                    Trusted by educators & organizations
-                  </span>
-                </div>
+              {/* Card 1: Visual Builder (Large) */}
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="md:col-span-2 md:row-span-2 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden relative group"
+              >
+                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent"></div>
+                 <div className="p-10 relative z-10">
+                   <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                     <Layout className="w-6 h-6" />
+                   </div>
+                   <h3 className="text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">Visual Builder</h3>
+                   <p className="text-slate-600 font-medium text-lg max-w-sm">Design pixel-perfect templates with our intuitive drag-and-drop canvas. Add custom fonts, dynamic variables, and logos.</p>
+                 </div>
+                 
+                 {/* Abstract UI Mockup */}
+                 <div className="absolute right-0 bottom-0 w-[70%] h-[60%] bg-white border-t border-l border-slate-200 shadow-2xl rounded-tl-2xl p-6 transition-transform group-hover:-translate-y-2 group-hover:-translate-x-2">
+                    <div className="w-full h-full border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative overflow-hidden">
+                       {/* Floating elements */}
+                       <motion.div 
+                          animate={{ y: [0, -10, 0] }} 
+                          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute top-1/4 left-1/4 px-4 py-2 bg-white shadow-lg border border-blue-200 rounded text-blue-600 font-mono font-bold text-sm"
+                        >
+                         {"{{first_name}}"}
+                       </motion.div>
+                       <motion.div 
+                          animate={{ y: [0, 10, 0] }} 
+                          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                          className="absolute bottom-1/4 right-1/4 px-4 py-2 bg-white shadow-lg border border-indigo-200 rounded text-indigo-600 font-mono font-bold text-sm"
+                        >
+                         {"{{course_name}}"}
+                       </motion.div>
+                    </div>
+                 </div>
+              </motion.div>
 
-                {/* Typography */}
-                <h1 className={`${playfair.className} text-5xl md:text-6xl lg:text-[4.5rem] font-extrabold text-slate-900 mb-6 leading-[1.05] tracking-tight`}>
-                  Issue beautiful certificates <span className="text-blue-600">at scale.</span>
-                </h1>
-                <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed font-medium">
-                  Design once, generate hundreds. CertiDraft automates your entire credential workflow — from CSV upload to verified PDF delivery in seconds.
-                </p>
+              {/* Card 2: Batch Processing */}
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative group text-white p-10 flex flex-col"
+              >
+                 <div className="w-12 h-12 bg-white/10 text-white rounded-xl flex items-center justify-center mb-6">
+                   <FileText className="w-6 h-6" />
+                 </div>
+                 <h3 className="text-2xl font-extrabold mb-3 tracking-tight">Batch Generation</h3>
+                 <p className="text-slate-400 font-medium leading-relaxed">Upload a CSV and let our engine map data to your template instantly. 1,000 PDFs in seconds.</p>
+                 
+                 <div className="mt-auto pt-8">
+                    <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                       <motion.div 
+                         className="h-full bg-blue-500 rounded-full" 
+                         initial={{ width: "0%" }} 
+                         whileInView={{ width: "100%" }} 
+                         transition={{ duration: 2, repeat: Infinity }}
+                       />
+                    </div>
+                    <p className="text-xs font-mono text-slate-500 mt-2 text-right">Processing 1000/1000</p>
+                 </div>
+              </motion.div>
 
-                {/* Buttons */}
-                <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold shadow-sm transition-transform hover:-translate-y-0.5 group" asChild>
-                    <Link href="/auth/signup">
-                      Start generating free 
-                      <ChevronRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </Button>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto h-14 px-8 text-base bg-white border-slate-200 text-slate-700 rounded-full font-semibold hover:bg-slate-50 hover:text-slate-900 transition-transform hover:-translate-y-0.5" asChild>
-                    <Link href="#features">Explore features</Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Right Column: 3D Certificate Mockup */}
-              <div className="relative w-full h-[500px] flex items-center justify-center lg:justify-end perspective-1000 hidden md:flex">
-                {/* Floating Certificate Canvas */}
-                <div className="w-[450px] aspect-[1.414] bg-white rounded-xl shadow-[0_30px_60px_rgba(0,0,0,0.1)] border border-slate-100 transform rotate-[-8deg] rotate-x-[15deg] rotate-y-[-15deg] transition-transform duration-700 hover:rotate-[-5deg] hover:rotate-y-0 hover:scale-105 p-8 flex flex-col items-center justify-center relative">
-                  <div className="absolute inset-2 border-2 border-slate-100 rounded-lg"></div>
-                  
-                  {/* Decorative Elements on Certificate */}
-                  <div className="w-16 h-16 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-6">
-                    <Award className="w-8 h-8" />
-                  </div>
-                  
-                  <div className="h-4 w-3/4 bg-slate-200 rounded-full mb-8"></div>
-                  
-                  <div className="h-8 w-1/2 border border-blue-200 bg-blue-50/50 rounded flex items-center justify-center mb-8 relative">
-                    <span className="text-blue-600 font-mono text-xs font-semibold">{"{{name}}"}</span>
-                    {/* UI Handles */}
-                    <div className="absolute -top-1 -left-1 w-2 h-2 bg-white border border-blue-500 rounded-sm"></div>
-                    <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-white border border-blue-500 rounded-sm"></div>
-                  </div>
-                  
-                  <div className="h-2 w-5/6 bg-slate-100 rounded-full mb-3"></div>
-                  <div className="h-2 w-4/6 bg-slate-100 rounded-full mb-12"></div>
-                  
-                  <div className="w-full flex justify-between items-end px-8">
-                     <div className="flex flex-col gap-2">
-                        <div className="h-0.5 w-24 bg-slate-300"></div>
-                        <div className="h-2 w-12 bg-slate-100 rounded-full mx-auto"></div>
-                     </div>
-                     <div className="w-14 h-14 bg-slate-100 rounded-md"></div>
-                  </div>
-                </div>
-              </div>
+              {/* Card 3: Verifiable Security */}
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden relative group p-10 flex flex-col"
+              >
+                 <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6">
+                   <Shield className="w-6 h-6" />
+                 </div>
+                 <h3 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight">Verifiable QR</h3>
+                 <p className="text-slate-600 font-medium leading-relaxed">Every certificate gets a unique, cryptographically secure QR code for instant authenticity verification.</p>
+                 
+                 <div className="mt-auto self-center p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
+                    <div className="grid grid-cols-4 gap-1">
+                      {[...Array(16)].map((_, i) => (
+                        <motion.div 
+                          key={i} 
+                          className="w-4 h-4 bg-slate-800 rounded-sm"
+                          animate={{ opacity: [1, 0.5, 1] }}
+                          transition={{ duration: 2, delay: i * 0.1, repeat: Infinity }}
+                        />
+                      ))}
+                    </div>
+                 </div>
+              </motion.div>
 
             </div>
           </div>
         </section>
 
-        {/* ── Features Section (Zig-Zag Layout) ─────────────────────────── */}
-        <section id="features" className="py-32 bg-white px-6">
-          <div className="container mx-auto max-w-6xl flex flex-col gap-32">
+        {/* ── 4. Interactive "How it Works" Tabs ──────────────────────────── */}
+        <section id="how-it-works" className="py-32 px-6 bg-white border-y border-slate-100">
+          <div className="container mx-auto max-w-6xl">
             
-            {/* Feature 1: Visual Builder */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="order-2 lg:order-1">
-                <h2 className={`${playfair.className} text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight`}>
-                  Visual Builder
-                </h2>
-                <p className="text-lg text-slate-600 leading-relaxed font-medium max-w-md">
-                  Design stunning certificates with our drag and drop canvas. Add custom fonts, logos, and signatures with ease.
-                </p>
-              </div>
-              
-              <div className="order-1 lg:order-2">
-                <div className="rounded-xl border border-slate-800 bg-slate-950 shadow-2xl overflow-hidden aspect-[4/3] flex flex-col">
-                  {/* Browser top */}
-                  <div className="h-8 bg-slate-900 border-b border-slate-800 flex items-center px-4 gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-700"></div>
-                    </div>
-                  </div>
-                  {/* Builder UI Mockup */}
-                  <div className="flex-1 flex p-4 gap-4">
-                    {/* Sidebar */}
-                    <div className="w-1/4 flex flex-col gap-3">
-                      <div className="h-6 bg-slate-800 rounded"></div>
-                      <div className="h-4 bg-slate-800/50 rounded w-3/4"></div>
-                      <div className="h-4 bg-slate-800/50 rounded w-1/2"></div>
-                      <div className="h-10 bg-blue-600/20 border border-blue-500/50 rounded mt-4 flex items-center justify-center">
-                         <span className="text-[10px] text-blue-400 font-mono">{"{{name}}"}</span>
-                      </div>
-                    </div>
-                    {/* Canvas */}
-                    <div className="flex-1 bg-slate-900 border border-slate-800 rounded-lg flex items-center justify-center p-8">
-                      <div className="w-full aspect-[1.414] bg-white rounded shadow-lg flex items-center justify-center relative">
-                         <div className="w-3/4 h-12 border-2 border-blue-400 bg-blue-50/50"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="text-center mb-16">
+              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+                How it works
+              </h2>
+              <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
+                A seamless workflow from design to delivery.
+              </p>
             </div>
 
-            {/* Feature 2: Batch Generation */}
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="order-1 lg:order-1">
-                <div className="rounded-xl border border-slate-200 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] overflow-hidden aspect-[4/3] flex flex-col">
-                  {/* Browser top */}
-                  <div className="h-8 bg-slate-50 border-b border-slate-200 flex items-center px-4 gap-2">
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                      <div className="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
+            <div className="grid lg:grid-cols-12 gap-12 items-center">
+              {/* Tabs List */}
+              <div className="lg:col-span-5 flex flex-col gap-4">
+                {tabs.map((tab, idx) => {
+                  const isActive = activeTab === idx
+                  const Icon = tab.icon
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveTab(idx)}
+                      className={`text-left p-6 rounded-2xl transition-all duration-300 border-2 ${
+                        isActive 
+                        ? 'bg-blue-50 border-blue-200 shadow-md transform scale-[1.02]' 
+                        : 'bg-white border-transparent hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+                          isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-slate-100 text-slate-500'
+                        }`}>
+                          <Icon className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className={`text-xl font-bold tracking-tight ${isActive ? 'text-blue-900' : 'text-slate-700'}`}>
+                            {tab.title}
+                          </h3>
+                          <p className={`font-medium mt-1 ${isActive ? 'text-blue-700' : 'text-slate-500'}`}>
+                            {tab.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Display Area */}
+              <div className="lg:col-span-7 h-[450px] relative">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 bg-slate-900 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden flex flex-col"
+                  >
+                    {/* Topbar mock */}
+                    <div className="h-12 bg-slate-950 border-b border-slate-800 flex items-center px-4 gap-2">
+                       <div className="w-3 h-3 rounded-full bg-slate-700"></div>
+                       <div className="w-3 h-3 rounded-full bg-slate-700"></div>
+                       <div className="w-3 h-3 rounded-full bg-slate-700"></div>
                     </div>
-                  </div>
-                  {/* CSV UI Mockup */}
-                  <div className="flex-1 p-8 flex flex-col">
-                    <div className="flex justify-between items-center mb-8">
-                       <h3 className="font-bold text-slate-800 text-lg">CSV upload</h3>
-                       <div className="px-4 py-1.5 bg-blue-600 text-white rounded text-xs font-bold">Start upload</div>
-                    </div>
-                    <div className="flex-1 border border-slate-200 rounded-lg overflow-hidden flex flex-col">
-                       <div className="h-10 bg-slate-50 border-b border-slate-200 flex items-center px-4 gap-4">
-                          <div className="w-4 h-4 rounded border border-slate-300 bg-white"></div>
-                          <div className="h-3 w-16 bg-slate-300 rounded-full"></div>
-                          <div className="h-3 w-24 bg-slate-300 rounded-full ml-auto"></div>
-                       </div>
-                       <div className="flex-1 p-4 flex flex-col gap-4">
-                          {[1,2,3,4].map(i => (
-                            <div key={i} className="flex items-center gap-4">
-                              <div className="w-4 h-4 rounded border border-slate-200"></div>
-                              <div className="h-2 w-32 bg-slate-100 rounded-full"></div>
-                              <div className="h-2 w-20 bg-slate-100 rounded-full ml-auto"></div>
+                    
+                    {/* Content mock based on active tab */}
+                    <div className="flex-1 p-8 flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+                      {activeTab === 0 && (
+                        <div className="w-full h-full border-2 border-blue-500/50 bg-blue-500/10 rounded-xl flex items-center justify-center relative">
+                           <div className="text-blue-400 font-mono font-bold text-xl border border-blue-400 px-6 py-3 bg-slate-900/50 backdrop-blur-sm rounded">{"{{ Certificate Title }}"}</div>
+                           <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-blue-400"></div>
+                           <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-blue-400"></div>
+                        </div>
+                      )}
+                      {activeTab === 1 && (
+                        <div className="w-full flex flex-col gap-4">
+                          <div className="h-10 w-full bg-white/10 rounded-lg flex items-center px-4 gap-4">
+                            <div className="w-4 h-4 bg-slate-400 rounded-sm"></div>
+                            <div className="h-4 w-32 bg-slate-500 rounded"></div>
+                          </div>
+                          {[1,2,3].map(i => (
+                            <div key={i} className="h-12 w-full bg-white/5 border border-white/10 rounded-lg flex items-center px-4 gap-4">
+                              <div className="h-4 w-24 bg-slate-600 rounded"></div>
+                              <div className="h-4 w-48 bg-slate-700 rounded ml-auto"></div>
                             </div>
                           ))}
-                       </div>
+                        </div>
+                      )}
+                      {activeTab === 2 && (
+                        <div className="flex flex-col items-center gap-6">
+                           <motion.div 
+                             animate={{ rotate: 360 }} 
+                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                           >
+                             <Settings className="w-16 h-16 text-blue-500" />
+                           </motion.div>
+                           <div className="text-white font-bold text-2xl tracking-tight">Generating 500 PDFs...</div>
+                           <div className="w-64 h-2 bg-slate-800 rounded-full overflow-hidden">
+                              <motion.div className="h-full bg-blue-500" animate={{ width: ["0%", "100%"] }} transition={{ duration: 2, repeat: Infinity }} />
+                           </div>
+                        </div>
+                      )}
+                      {activeTab === 3 && (
+                        <div className="w-full h-full flex items-center justify-center">
+                           <div className="bg-white rounded-xl p-6 w-80 shadow-2xl transform rotate-3">
+                             <div className="flex items-center gap-4 border-b pb-4 mb-4">
+                               <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center"><Mail className="w-5 h-5"/></div>
+                               <div>
+                                 <div className="font-bold text-slate-800 text-sm">To: jane@example.com</div>
+                                 <div className="text-xs text-slate-500">Your Certificate is ready!</div>
+                               </div>
+                             </div>
+                             <div className="h-20 bg-slate-100 rounded border border-slate-200 flex items-center justify-center text-slate-400 font-bold text-xs">PDF Attachment</div>
+                           </div>
+                           <motion.div 
+                             className="absolute"
+                             animate={{ x: [0, 100], opacity: [1, 0] }}
+                             transition={{ duration: 1.5, repeat: Infinity }}
+                           >
+                             <Send className="w-8 h-8 text-blue-400 ml-32" />
+                           </motion.div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="order-2 lg:order-2">
-                <h2 className={`${playfair.className} text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight`}>
-                  Batch Generation
-                </h2>
-                <p className="text-lg text-slate-600 leading-relaxed font-medium max-w-md">
-                  Upload a CSV file and map your columns. Generate hundreds of personalized PDFs in seconds.
-                </p>
+                  </motion.div>
+                </AnimatePresence>
               </div>
             </div>
 
           </div>
         </section>
 
-        {/* ── Pricing Section ─────────────────────────────────────────────── */}
-        <section id="pricing" className="py-32 px-6 bg-slate-50 border-t border-slate-200">
+        {/* ── 5. Before & After Slider ────────────────────────────────────── */}
+        <section className="py-32 bg-slate-50 border-b border-slate-200 px-6">
+          <div className="container mx-auto max-w-5xl">
+            <div className="text-center mb-16">
+              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+                The CertiDraft Difference
+              </h2>
+              <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
+                Stop wasting hours on manual formatting. See the transformation.
+              </p>
+            </div>
+
+            <div className="relative w-full aspect-video bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-200 select-none">
+              
+              {/* "Before" Layer (Always at bottom) */}
+              <div className="absolute inset-0 bg-slate-100 p-8 flex flex-col font-mono text-sm text-slate-500">
+                <div className="font-bold text-slate-800 text-2xl mb-6 font-sans">The Old Way (Manual)</div>
+                <div className="flex-1 border-2 border-dashed border-slate-300 rounded-xl bg-white p-4 flex flex-col gap-2">
+                   {[...Array(6)].map((_, i) => (
+                     <div key={i} className="flex gap-2">
+                       <div className="h-6 w-24 bg-red-100 rounded border border-red-200 flex items-center px-2 text-red-800 text-xs">Error</div>
+                       <div className="h-6 w-48 bg-slate-200 rounded"></div>
+                       <div className="h-6 w-full bg-slate-100 rounded"></div>
+                     </div>
+                   ))}
+                </div>
+              </div>
+
+              {/* "After" Layer (Clipped by slider) */}
+              <div 
+                className="absolute inset-0 bg-slate-900 p-8 flex flex-col text-white shadow-[10px_0_20px_rgba(0,0,0,0.5)]"
+                style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+              >
+                <div className="font-bold text-white text-2xl mb-6 font-sans">The CertiDraft Way</div>
+                <div className="flex-1 rounded-xl bg-slate-800 border border-slate-700 p-6 flex flex-col justify-center items-center gap-6">
+                   <div className="flex items-center gap-4 text-green-400 font-bold text-xl">
+                      <Check className="w-8 h-8" />
+                      Data Mapped Perfectly
+                   </div>
+                   <div className="flex gap-4">
+                     <div className="w-24 h-32 bg-white rounded shadow-lg"></div>
+                     <div className="w-24 h-32 bg-white rounded shadow-lg transform translate-y-4"></div>
+                     <div className="w-24 h-32 bg-white rounded shadow-lg"></div>
+                   </div>
+                </div>
+              </div>
+
+              {/* Slider Handle overlay */}
+              <div 
+                className="absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize shadow-[0_0_10px_rgba(0,0,0,0.3)] z-10"
+                style={{ left: `${sliderPosition}%` }}
+              >
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl border-2 border-slate-200 flex items-center justify-center">
+                  <div className="flex gap-1">
+                    <div className="w-1 h-3 bg-slate-300 rounded-full"></div>
+                    <div className="w-1 h-3 bg-slate-300 rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Native range input hidden on top for actual dragging interaction */}
+              <input 
+                type="range" 
+                min="0" max="100" 
+                value={sliderPosition} 
+                onChange={(e) => setSliderPosition(Number(e.target.value))}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* ── 6. Pricing Section ──────────────────────────────────────────── */}
+        <section id="pricing" className="py-32 px-6 bg-white border-b border-slate-200">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-20">
               <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight`}>
@@ -230,266 +475,128 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Visual Timeline (Top) */}
-            <div className="relative w-full max-w-4xl mx-auto mb-10 hidden md:block">
-               <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-200 -translate-y-1/2 rounded-full"></div>
-               {/* Blue progress line up to 300 */}
-               <div className="absolute top-1/2 left-0 w-[60%] h-1 bg-blue-600 -translate-y-1/2 rounded-full"></div>
-               
-               <div className="relative flex justify-between w-full px-8">
-                  {/* Nodes */}
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-sm mb-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500">0</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-sm mb-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500">50</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-sm mb-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500">300</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-slate-300 border-4 border-white shadow-sm mb-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500">1000+</span>
-                  </div>
-               </div>
-            </div>
-
-            {/* Pricing Cards */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               
-              {/* Free */}
-              <Card className="flex flex-col h-full bg-white border-slate-200 shadow-sm rounded-2xl p-2 pt-6">
-                <CardHeader className="p-6 pt-0 pb-4">
-                  <CardTitle className="text-xl font-bold text-slate-900 tracking-tight">Free</CardTitle>
-                  <CardDescription className="text-slate-500 font-medium h-5">Perfect for trying it out</CardDescription>
-                  <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-slate-400 font-bold text-xl -translate-y-2">₱</span>
-                    <span className="text-5xl font-extrabold text-slate-900 tracking-tight">0</span>
-                    <span className="text-slate-500 font-medium ml-1 text-sm">/month</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 p-6 pt-2 pb-6">
-                  <ul className="space-y-4">
-                    <li className="flex items-start gap-3">
-                      <div className="bg-slate-100 p-1 rounded-md"><Check className="w-3 h-3 text-slate-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">5 certificates</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="bg-slate-100 p-1 rounded-md"><Check className="w-3 h-3 text-slate-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">Basic templates</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="bg-slate-100 p-1 rounded-md"><Check className="w-3 h-3 text-slate-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">Standard support</span>
-                    </li>
-                  </ul>
-                </CardContent>
-                <CardFooter className="p-6 pt-0 mt-auto">
-                  <Button variant="outline" className="w-full h-11 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-semibold" asChild>
-                    <Link href="/auth/signup">Get started</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-
               {/* Starter */}
-              <Card className="flex flex-col h-full bg-white border-slate-200 shadow-sm rounded-2xl p-2 pt-6">
-                <CardHeader className="p-6 pt-0 pb-4">
-                  <CardTitle className="text-xl font-bold text-slate-900 tracking-tight">Starter</CardTitle>
-                  <CardDescription className="text-slate-500 font-medium h-5">For small events</CardDescription>
-                  <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-slate-400 font-bold text-xl -translate-y-2">₱</span>
-                    <span className="text-5xl font-extrabold text-slate-900 tracking-tight">199</span>
-                    <span className="text-slate-500 font-medium ml-1 text-sm">/month</span>
+              <Card className="flex flex-col h-full bg-slate-50 border-slate-200 shadow-sm rounded-3xl p-4">
+                <CardHeader className="p-6">
+                  <CardTitle className="text-2xl font-extrabold text-slate-900 tracking-tight">Starter</CardTitle>
+                  <CardDescription className="text-slate-500 font-medium text-base mt-2">For small events</CardDescription>
+                  <div className="mt-6 flex items-baseline gap-1">
+                    <span className="text-slate-400 font-bold text-2xl -translate-y-2">₱</span>
+                    <span className="text-6xl font-extrabold text-slate-900 tracking-tight">199</span>
+                    <span className="text-slate-500 font-medium ml-1">/mo</span>
                   </div>
                 </CardHeader>
-                <CardContent className="flex-1 p-6 pt-2 pb-6">
+                <CardContent className="flex-1 p-6">
                   <ul className="space-y-4">
-                    <li className="flex items-start gap-3">
-                      <div className="bg-blue-50 p-1 rounded-md"><Check className="w-3 h-3 text-blue-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">50 certificates</span>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-blue-600 stroke-[3]" />
+                      <span className="text-slate-700 font-medium text-base">50 certificates</span>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <div className="bg-blue-50 p-1 rounded-md"><Check className="w-3 h-3 text-blue-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">All templates</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="bg-blue-50 p-1 rounded-md"><Check className="w-3 h-3 text-blue-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">QR Verification</span>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-blue-600 stroke-[3]" />
+                      <span className="text-slate-700 font-medium text-base">Basic templates</span>
                     </li>
                   </ul>
                 </CardContent>
-                <CardFooter className="p-6 pt-0 mt-auto">
-                  <Button variant="outline" className="w-full h-11 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-semibold" asChild>
+                <CardFooter className="p-6 mt-auto">
+                  <Button variant="outline" className="w-full h-14 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-lg transition-colors" asChild>
                     <Link href="/auth/signup">Get started</Link>
                   </Button>
                 </CardFooter>
               </Card>
 
               {/* Pro (Highlighted) */}
-              <div className="relative h-full flex flex-col lg:-mt-4 lg:mb-[-1rem]">
-                <div className="absolute top-0 inset-x-0 flex justify-center z-10 -translate-y-1/2">
-                  <span className="bg-blue-600 text-white text-[10px] font-bold tracking-widest uppercase px-4 py-1 rounded-full shadow-sm">
-                    Most popular
+              <Card className="flex flex-col h-full bg-slate-900 border-slate-800 shadow-2xl rounded-3xl p-4 relative transform md:-translate-y-4">
+                <div className="absolute top-0 inset-x-0 flex justify-center -translate-y-1/2">
+                  <span className="bg-blue-500 text-white text-xs font-extrabold tracking-widest uppercase px-6 py-2 rounded-full shadow-lg">
+                    Most Popular
                   </span>
                 </div>
                 
-                <Card className="flex flex-col h-full bg-white border-2 border-blue-600 shadow-md rounded-2xl p-2 pt-8 relative z-0">
-                  <CardHeader className="p-6 pt-0 pb-4">
-                    <CardTitle className="text-xl font-bold text-blue-600 tracking-tight">Pro</CardTitle>
-                    <CardDescription className="text-slate-500 font-medium h-5">For growing organizations</CardDescription>
-                    <div className="mt-4 flex items-baseline gap-1">
-                      <span className="text-slate-400 font-bold text-xl -translate-y-2">₱</span>
-                      <span className="text-5xl font-extrabold text-slate-900 tracking-tight">599</span>
-                      <span className="text-slate-500 font-medium ml-1 text-sm">/month</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="flex-1 p-6 pt-2 pb-6">
-                    <ul className="space-y-4">
-                      <li className="flex items-start gap-3">
-                         <div className="bg-blue-50 p-1 rounded-md"><Check className="w-3 h-3 text-blue-600 stroke-[3]" /></div>
-                         <span className="text-slate-900 font-bold text-sm">300 certificates</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                         <div className="bg-blue-50 p-1 rounded-md"><Check className="w-3 h-3 text-blue-600 stroke-[3]" /></div>
-                         <span className="text-slate-700 font-medium text-sm">Custom branding</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                         <div className="bg-blue-50 p-1 rounded-md"><Check className="w-3 h-3 text-blue-600 stroke-[3]" /></div>
-                         <span className="text-slate-700 font-medium text-sm">Email delivery</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                         <div className="bg-indigo-50 p-1 rounded-md"><Check className="w-3 h-3 text-indigo-600 stroke-[3]" /></div>
-                         <span className="text-indigo-700 font-bold text-sm">AI Citations</span>
-                      </li>
-                    </ul>
-                  </CardContent>
-                  <CardFooter className="p-6 pt-0 mt-auto">
-                    <Button className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-sm" asChild>
-                      <Link href="/auth/signup">Get started</Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
-
-              {/* Enterprise */}
-              <Card className="flex flex-col h-full bg-white border-slate-200 shadow-sm rounded-2xl p-2 pt-6">
-                <CardHeader className="p-6 pt-0 pb-4">
-                  <CardTitle className="text-xl font-bold text-slate-900 tracking-tight">Enterprise</CardTitle>
-                  <CardDescription className="text-slate-500 font-medium h-5">For huge scale ops</CardDescription>
-                  <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-slate-400 font-bold text-xl -translate-y-2">₱</span>
-                    <span className="text-5xl font-extrabold text-slate-900 tracking-tight">1499</span>
-                    <span className="text-slate-500 font-medium ml-1 text-sm">/month</span>
+                <CardHeader className="p-6">
+                  <CardTitle className="text-2xl font-extrabold text-white tracking-tight">Pro</CardTitle>
+                  <CardDescription className="text-slate-400 font-medium text-base mt-2">For growing organizations</CardDescription>
+                  <div className="mt-6 flex items-baseline gap-1 text-white">
+                    <span className="text-slate-500 font-bold text-2xl -translate-y-2">₱</span>
+                    <span className="text-6xl font-extrabold tracking-tight">599</span>
+                    <span className="text-slate-500 font-medium ml-1">/mo</span>
                   </div>
                 </CardHeader>
-                <CardContent className="flex-1 p-6 pt-2 pb-6">
+                <CardContent className="flex-1 p-6">
                   <ul className="space-y-4">
-                    <li className="flex items-start gap-3">
-                      <div className="bg-slate-100 p-1 rounded-md"><Check className="w-3 h-3 text-slate-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">1000+ certificates</span>
+                    <li className="flex items-center gap-3 text-white">
+                       <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                       <span className="font-bold text-base">300 certificates</span>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <div className="bg-slate-100 p-1 rounded-md"><Check className="w-3 h-3 text-slate-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">API Access</span>
+                    <li className="flex items-center gap-3 text-slate-300">
+                       <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                       <span className="font-medium text-base">Custom branding</span>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <div className="bg-slate-100 p-1 rounded-md"><Check className="w-3 h-3 text-slate-600 stroke-[3]" /></div>
-                      <span className="text-slate-600 font-medium text-sm">Priority support</span>
+                    <li className="flex items-center gap-3 text-slate-300">
+                       <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                       <span className="font-medium text-base">Email delivery</span>
                     </li>
                   </ul>
                 </CardContent>
-                <CardFooter className="p-6 pt-0 mt-auto">
-                  <Button variant="outline" className="w-full h-11 bg-white border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-semibold" asChild>
+                <CardFooter className="p-6 mt-auto">
+                  <Button className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-900/50 transition-colors" asChild>
                     <Link href="/auth/signup">Get started</Link>
                   </Button>
                 </CardFooter>
               </Card>
-            </div>
 
-            {/* Visual Timeline (Bottom) */}
-            <div className="relative w-full max-w-4xl mx-auto mt-10 hidden md:block">
-               <div className="absolute top-1/2 left-0 w-full h-1 bg-slate-200 -translate-y-1/2 rounded-full"></div>
-               {/* Blue progress line up to 300 */}
-               <div className="absolute top-1/2 left-0 w-[60%] h-1 bg-blue-600 -translate-y-1/2 rounded-full"></div>
-               
-               <div className="relative flex justify-between w-full px-8">
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-sm mt-2 order-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500 order-1 mb-2">0</span>
+              {/* Enterprise */}
+              <Card className="flex flex-col h-full bg-slate-50 border-slate-200 shadow-sm rounded-3xl p-4">
+                <CardHeader className="p-6">
+                  <CardTitle className="text-2xl font-extrabold text-slate-900 tracking-tight">Enterprise</CardTitle>
+                  <CardDescription className="text-slate-500 font-medium text-base mt-2">For huge scale ops</CardDescription>
+                  <div className="mt-6 flex items-baseline gap-1">
+                    <span className="text-slate-400 font-bold text-2xl -translate-y-2">₱</span>
+                    <span className="text-6xl font-extrabold text-slate-900 tracking-tight">1499</span>
+                    <span className="text-slate-500 font-medium ml-1">/mo</span>
                   </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-sm mt-2 order-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500 order-1 mb-2">50</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-sm mt-2 order-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500 order-1 mb-2">300</span>
-                  </div>
-                  <div className="flex flex-col items-center">
-                     <div className="w-4 h-4 rounded-full bg-slate-300 border-4 border-white shadow-sm mt-2 order-2 relative z-10"></div>
-                     <span className="text-xs font-bold text-slate-500 order-1 mb-2">1000+</span>
-                  </div>
-               </div>
+                </CardHeader>
+                <CardContent className="flex-1 p-6">
+                  <ul className="space-y-4">
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-slate-400 stroke-[3]" />
+                      <span className="text-slate-700 font-medium text-base">1000+ certificates</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="w-5 h-5 text-slate-400 stroke-[3]" />
+                      <span className="text-slate-700 font-medium text-base">API Access</span>
+                    </li>
+                  </ul>
+                </CardContent>
+                <CardFooter className="p-6 mt-auto">
+                  <Button variant="outline" className="w-full h-14 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-lg transition-colors" asChild>
+                    <Link href="/auth/signup">Contact Sales</Link>
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
-
           </div>
         </section>
+
       </main>
 
-      {/* ── Footer (Dark Mode) ────────────────────────────────────────────── */}
-      <footer className="bg-slate-950 pt-20 pb-10">
+      {/* ── Footer ──────────────────────────────────────────────────────── */}
+      <footer className="bg-slate-50 pt-20 pb-10">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
-            
-            {/* Column 1: Logo & Description */}
-            <div className="flex flex-col items-start gap-6">
-              <div className="flex items-center gap-2">
-                 <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center">
-                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-                 </div>
-                 <span className="text-xl font-bold tracking-tight text-white">CertiDraft</span>
-              </div>
-              <p className="text-slate-400 font-medium text-sm leading-relaxed max-w-xs">
-                Design once, generate hundreds. The modern platform for professional, verifiable credentials.
-              </p>
+          <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+               <div className="h-6 w-6 bg-slate-900 rounded flex items-center justify-center">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-white"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+               </div>
+               <span className="font-bold tracking-tight text-slate-900">CertiDraft</span>
             </div>
-
-            {/* Column 2: Product */}
-            <div className="flex flex-col gap-4">
-              <h4 className="font-bold text-white mb-2">Product</h4>
-              <Link href="#features" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Features</Link>
-              <Link href="#pricing" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Pricing</Link>
-              <Link href="/templates" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Templates</Link>
+            <div className="flex gap-6">
+              <a href="#" className="text-sm font-bold text-slate-500 hover:text-slate-900">Privacy</a>
+              <a href="#" className="text-sm font-bold text-slate-500 hover:text-slate-900">Terms</a>
             </div>
-
-            {/* Column 3: Company */}
-            <div className="flex flex-col gap-4">
-              <h4 className="font-bold text-white mb-2">Company</h4>
-              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Privacy Policy</Link>
-              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Terms of Service</Link>
-              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Contact Support</Link>
-            </div>
-          </div>
-
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              </a>
-            </div>
-            <div className="text-sm text-slate-500 font-medium">
+            <div className="text-sm text-slate-400 font-medium">
               © {new Date().getFullYear()} CertiDraft. All rights reserved.
             </div>
           </div>
