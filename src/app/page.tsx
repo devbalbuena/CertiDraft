@@ -13,7 +13,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card'
-import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Send } from 'lucide-react'
+import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Send, Mail } from 'lucide-react'
 
 // Load the serif font for headings
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700', '800'] })
