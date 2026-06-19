@@ -105,7 +105,7 @@ export default async function ProjectsPage() {
           action={<CreateProjectDialog />}
         />
       ) : (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6 animate-stagger-children">
           {projects.map((project) => {
             const createdAt = new Date(project.created_at).toLocaleDateString('en-US', {
               month: 'short',

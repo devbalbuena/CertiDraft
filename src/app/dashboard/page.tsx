@@ -120,7 +120,7 @@ export default async function DashboardPage() {
       />
 
       {/* ── Stats row ────────────────────────────────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10 animate-stagger-children">
         <StatCard
           label="Total Certificates"
           value={totalCerts ?? 0}
