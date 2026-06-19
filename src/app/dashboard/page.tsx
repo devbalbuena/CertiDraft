@@ -1,25 +1,24 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { StatCard } from '@/components/layout/StatCard'
-import { EmptyState } from '@/components/layout/EmptyState'
+import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog'
 import { Button } from '@/components/ui/button'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { DashboardChartsClient, DailyCount } from './DashboardChartsClient'
 import {
   Award,
   CalendarDays,
   CreditCard,
   FolderOpen,
-  Inbox,
   ArrowRight,
+  Plus,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  XCircle,
+  RefreshCw,
+  Box,
 } from 'lucide-react'
 
 // ── Plan limits lookup ────────────────────────────────────────────────────────
@@ -30,45 +29,68 @@ const PLAN_LIMITS: Record<string, number> = {
   enterprise: 1000,
 }
 
-// ── Status badge mapping ──────────────────────────────────────────────────────
-function BatchStatusBadge({ status }: { status: string }) {
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function lastNDays(n: number): string[] {
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - (n - 1 - i))
+    return d.toISOString().split('T')[0]
+  })
+}
+
+function Sparkline({ color = '#2563eb' }: { color?: string }) {
+  return (
+    <svg className="w-full h-8 mt-2" viewBox="0 0 100 20" preserveAspectRatio="none">
+      <path
+        d="M0,10 C20,20 40,0 60,10 C80,20 100,5"
+        fill="none"
+        stroke={color}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function ProgressBar({ pct, colorClass = 'bg-blue-500' }: { pct: number, colorClass?: string }) {
+  return (
+    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-6">
+      <div className={`h-full rounded-full ${colorClass}`} style={{ width: `${pct}%` }} />
+    </div>
+  )
+}
+
+function getStatusIcon(status: string) {
+  switch (status) {
+    case 'completed': return <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    case 'completed_with_errors': return <AlertCircle className="w-5 h-5 text-amber-500" />
+    case 'failed': return <XCircle className="w-5 h-5 text-red-500" />
+    case 'processing': return <RefreshCw className="w-5 h-5 text-blue-500 animate-spin-slow" />
+    default: return <Clock className="w-5 h-5 text-slate-400" />
+  }
+}
+
+function getStatusBadge(status: string) {
   const map: Record<string, { label: string; className: string }> = {
-    completed: {
-      label: 'Completed',
-      className: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
-    },
-    completed_with_errors: {
-      label: 'Partial',
-      className: 'bg-amber-50 text-amber-700 border border-amber-200/60',
-    },
-    processing: {
-      label: 'Processing',
-      className: 'bg-blue-50 text-blue-700 border border-blue-200/60',
-    },
-    retrying: {
-      label: 'Retrying',
-      className: 'bg-amber-50 text-amber-700 border border-amber-200/60',
-    },
-    failed: {
-      label: 'Failed',
-      className: 'bg-red-50 text-red-700 border border-red-200/60',
-    },
-    pending: {
-      label: 'Pending',
-      className: 'bg-slate-100 text-slate-700 border border-slate-200/60',
-    },
+    completed: { label: 'Done', className: 'bg-emerald-50 text-emerald-700' },
+    completed_with_errors: { label: 'Partial', className: 'bg-amber-50 text-amber-700' },
+    processing: { label: 'Active', className: 'bg-blue-50 text-blue-700' },
+    retrying: { label: 'Retry', className: 'bg-amber-50 text-amber-700' },
+    failed: { label: 'Failed', className: 'bg-red-50 text-red-700' },
+    pending: { label: 'Wait', className: 'bg-slate-100 text-slate-700' },
   }
   const config = map[status] ?? map.pending
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide uppercase ${config.className}`}
-    >
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${config.className}`}>
       {config.label}
     </span>
   )
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 
@@ -78,10 +100,10 @@ export default async function DashboardPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  // Fetch user profile (plan + this-month count)
+  // Fetch user profile (plan + this-month count + full name)
   const { data: profile } = await supabase
     .from('users')
-    .select('plan, certificates_this_month')
+    .select('plan, certificates_this_month, full_name')
     .eq('id', user.id)
     .single()
 
@@ -97,131 +119,195 @@ export default async function DashboardPage() {
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
 
-  // Fetch 5 most recent batch jobs joined with project name
+  // Fetch 6 most recent batch jobs joined with project name
   const { data: recentBatches } = await supabase
     .from('batch_jobs')
     .select('id, status, processed_count, total_count, created_at, projects(name)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(5)
+    .limit(6)
 
+  // Fetch certificates from the last 30 days for the chart
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  const { data: recentCerts } = await supabase
+    .from('certificates')
+    .select('created_at')
+    .eq('user_id', user.id)
+    .gte('created_at', thirtyDaysAgo)
+
+  // Aggregate chart data
+  const days30 = lastNDays(30)
+  const certDayCounts = (recentCerts ?? []).reduce<Record<string, number>>((acc, c) => {
+    const d = c.created_at.split('T')[0]
+    acc[d] = (acc[d] ?? 0) + 1
+    return acc
+  }, {})
+  const chartData: DailyCount[] = days30.map((d) => ({ date: d, count: certDayCounts[d] ?? 0 }))
+
+  // Calculate metrics
   const plan = profile?.plan ?? 'free'
   const usedThisMonth = profile?.certificates_this_month ?? 0
   const planLimit = PLAN_LIMITS[plan] ?? 5
-  
-  // Calculate progress percentage, capped at 100
   const progressPercentage = Math.min((usedThisMonth / planLimit) * 100, 100)
+  const firstName = profile?.full_name?.split(' ')[0] ?? 'there'
+  const certsToday = chartData[chartData.length - 1].count
 
   return (
-    <div>
-      <PageHeader
-        title="Dashboard"
-        subtitle="Welcome back. Here's an overview of your activity."
-      />
+    <div className="pb-12">
+      
+      {/* ── Welcome Banner ─────────────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-8 sm:p-10 text-white shadow-md mb-8">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-2">
+              Welcome back, {firstName}!
+            </h1>
+            <p className="text-blue-100 max-w-xl text-[15px] font-medium leading-relaxed">
+              Your certificate drafting dashboard is ready. Create a new project to start generating credentials, or pick up where you left off.
+            </p>
+          </div>
+          <CreateProjectDialog
+            trigger={
+              <Button className="bg-white text-indigo-700 hover:bg-slate-50 shadow-sm font-bold h-12 px-6 shrink-0 rounded-xl transition-transform active:scale-95">
+                <Plus className="w-5 h-5 mr-2" />
+                Create New Project
+              </Button>
+            }
+          />
+        </div>
+        {/* Background Decorative Icon */}
+        <div className="absolute -right-10 -top-24 opacity-10 pointer-events-none">
+          <Award className="w-80 h-80 text-white transform rotate-12" />
+        </div>
+      </div>
 
-      {/* ── Stats row ────────────────────────────────────────────────────── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-10 animate-stagger-children">
+      {/* ── Stats Row ──────────────────────────────────────────────────────── */}
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8 animate-stagger-children">
         <StatCard
           label="Total Certificates"
           value={totalCerts ?? 0}
           icon={Award}
           variant="primary"
-        />
+          trend={{ value: certsToday, label: 'new today', isPositive: true }}
+        >
+          <Sparkline color="#3b82f6" />
+        </StatCard>
+        
         <StatCard
           label="This Month"
           value={`${usedThisMonth} / ${planLimit}`}
           icon={CalendarDays}
+          variant="destructive"
+          trend={{ value: 0, label: 'Limit usage', isPositive: false }}
         >
-          {/* Progress Bar for This Month */}
-          <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-             <div 
-               className={`h-full rounded-full ${progressPercentage >= 100 ? 'bg-red-500' : 'bg-blue-500'}`} 
-               style={{ width: `${progressPercentage}%` }}
-             ></div>
-          </div>
+          <ProgressBar 
+            pct={progressPercentage} 
+            colorClass={progressPercentage >= 100 ? 'bg-red-500' : 'bg-amber-500'} 
+          />
         </StatCard>
+
         <StatCard
           label="Current Plan"
           value={plan.charAt(0).toUpperCase() + plan.slice(1)}
           icon={CreditCard}
+          variant="success"
+          trend={{ value: 100, label: 'Active', isPositive: true }}
         >
-          {/* Upgrade Link for Current Plan */}
           <Link 
             href="/dashboard/subscription" 
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors group"
+            className="text-[13px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors mt-6 w-max"
           >
-            Upgrade plan 
-            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+            Upgrade plan <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
           </Link>
         </StatCard>
+
         <StatCard
-          label="Projects"
+          label="Total Projects"
           value={totalProjects ?? 0}
           icon={FolderOpen}
           variant="primary"
-        />
+        >
+          <Sparkline color="#8b5cf6" />
+        </StatCard>
       </div>
 
-      {/* ── Recent Activity ───────────────────────────────────────────────── */}
-      <div>
-        <h2 className="text-lg font-bold text-slate-900 tracking-tight mb-4">Recent Activity</h2>
+      {/* ── Main Content Split ─────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-stagger-children">
+        
+        {/* Left: Charts */}
+        <div className="lg:col-span-2">
+          <DashboardChartsClient data={chartData} />
+        </div>
 
-        {!recentBatches || recentBatches.length === 0 ? (
-          <EmptyState
-            title="No certificate batches yet"
-            description="Create a project and upload a CSV file to generate your first batch of certificates."
-            icon={Inbox}
-            action={
-              <Button asChild className="bg-blue-600 hover:bg-blue-700 rounded-full">
-                <Link href="/dashboard/projects">Create your first project</Link>
-              </Button>
-            }
-          />
-        ) : (
-          <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-            <Table>
-              <TableHeader className="bg-slate-50/50">
-                <TableRow className="hover:bg-transparent border-slate-200">
-                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Project</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Status</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Progress</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4">Created</TableHead>
-                  <TableHead className="text-xs font-semibold text-slate-500 uppercase tracking-wider py-4 text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {recentBatches.map((batch) => {
+        {/* Right: Modern Activity Feed */}
+        <div className="lg:col-span-1">
+          <Card className="rounded-2xl border-slate-200 shadow-sm bg-white h-full flex flex-col">
+            <CardHeader className="pb-2 border-b border-slate-100">
+              <CardTitle className="text-lg font-bold text-slate-900 tracking-tight">
+                Recent Activity
+              </CardTitle>
+              <CardDescription className="text-slate-500 font-medium">
+                Latest batch generation jobs.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col p-4 gap-2">
+              {!recentBatches || recentBatches.length === 0 ? (
+                <div className="h-full w-full flex flex-col items-center justify-center text-slate-400 py-10">
+                  <Box className="w-8 h-8 mb-3 opacity-20" />
+                  <p className="text-sm font-medium text-center">No recent jobs.<br/>Create a project to start.</p>
+                </div>
+              ) : (
+                recentBatches.map((batch) => {
                   const projectName = Array.isArray(batch.projects)
                     ? (batch.projects[0]?.name ?? 'Untitled')
                     : ((batch.projects as { name: string } | null)?.name ?? 'Untitled')
                   const createdAt = new Date(batch.created_at).toLocaleDateString('en-US', {
                     month: 'short',
                     day: 'numeric',
-                    year: 'numeric',
                   })
+                  
                   return (
-                    <TableRow key={batch.id} className="border-slate-100 hover:bg-slate-50/50 transition-colors">
-                      <TableCell className="font-semibold text-slate-900 py-4">{projectName}</TableCell>
-                      <TableCell className="py-4">
-                        <BatchStatusBadge status={batch.status} />
-                      </TableCell>
-                      <TableCell className="text-slate-500 font-medium text-sm py-4">
-                        {batch.processed_count} / {batch.total_count}
-                      </TableCell>
-                      <TableCell className="text-slate-500 text-sm py-4">{createdAt}</TableCell>
-                      <TableCell className="text-right py-4">
-                        <Button variant="outline" size="sm" className="h-8 text-xs font-medium text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900" asChild>
-                          <Link href={`/dashboard/projects`}>View</Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                    <div 
+                      key={batch.id} 
+                      className="group flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 cursor-pointer"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0 shadow-sm">
+                        {getStatusIcon(batch.status)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-bold text-slate-900 truncate">
+                          {projectName}
+                        </p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <p className="text-[11px] text-slate-500 font-semibold tracking-wide">
+                            {createdAt.toUpperCase()}
+                          </p>
+                          <span className="text-slate-300">•</span>
+                          <p className="text-[11px] text-slate-500 font-semibold">
+                            {batch.processed_count}/{batch.total_count} CERTS
+                          </p>
+                        </div>
+                      </div>
+                      <div className="shrink-0">
+                        {getStatusBadge(batch.status)}
+                      </div>
+                    </div>
                   )
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+                })
+              )}
+            </CardContent>
+            {recentBatches && recentBatches.length > 0 && (
+              <div className="p-4 border-t border-slate-100 bg-slate-50/50 text-center rounded-b-2xl">
+                 <Link href="/dashboard/projects" className="text-xs font-bold text-slate-600 hover:text-slate-900 transition-colors">
+                   View all projects →
+                 </Link>
+              </div>
+            )}
+          </Card>
+        </div>
+
       </div>
+
     </div>
   )
 }
