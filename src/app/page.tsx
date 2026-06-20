@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Playfair_Display } from 'next/font/google'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,7 +14,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card'
-import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Send, Mail } from 'lucide-react'
+import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Send, Mail, Sparkles, Mic, RefreshCw, Plus } from 'lucide-react'
 
 // Load the serif font for headings
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700', '800'] })
@@ -24,8 +25,21 @@ const LOGOS = [
 ]
 
 export default function LandingPage() {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState(0)
   const [sliderPosition, setSliderPosition] = useState(50)
+  const [prompt, setPrompt] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+
+  const handleGenerate = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!prompt.trim()) return
+    setIsGenerating(true)
+    // Simulate a brief loading state before redirect for effect
+    setTimeout(() => {
+      router.push(`/auth/signup?prompt=${encodeURIComponent(prompt)}`)
+    }, 600)
+  }
   
   const tabs = [
     { title: "1. Design", icon: Layout, desc: "Drag and drop builder" },
@@ -98,32 +112,139 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className={`${playfair.className} text-5xl md:text-7xl font-extrabold text-slate-900 mb-8 leading-[1.1] tracking-tight max-w-4xl`}
+              className={`${playfair.className} text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-[1.1] tracking-tight max-w-4xl`}
             >
-              Issue beautiful certificates <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">at scale.</span>
+              Free AI Certificate Generator
             </motion.h1>
 
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg md:text-xl text-slate-600 mb-12 leading-relaxed font-medium max-w-2xl"
+              className="text-lg text-slate-600 mb-12 leading-relaxed font-medium max-w-2xl"
             >
-              Design once, generate hundreds. CertiDraft automates your entire credential workflow — from CSV upload to verified PDF delivery in seconds.
+              Prompt text and our AI generates editable, professional certificates instantly. Create awards, recognition, or course completion certificates in seconds.
             </motion.p>
 
+            {/* AI Prompt Box */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, type: "spring", stiffness: 100 }}
+              className="w-full max-w-3xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-200 overflow-hidden"
+            >
+              <form onSubmit={handleGenerate}>
+                {/* Fake Toolbar */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                  <div className="flex items-center gap-4">
+                    <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors">
+                      <Sparkles className="w-4 h-4" />
+                    </button>
+                    <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors">
+                      <Settings className="w-4 h-4" />
+                    </button>
+                    <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors">
+                      <RefreshCw className="w-4 h-4" />
+                    </button>
+                    <div className="h-4 w-px bg-slate-200"></div>
+                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">Upgrade</span>
+                    <span className="text-xs font-medium text-slate-500 hidden sm:inline">for best quality and full control.</span>
+                  </div>
+                </div>
+                
+                {/* Text Area */}
+                <div className="p-4 relative">
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Describe the award or certificate details..."
+                    className="w-full h-24 resize-none outline-none text-slate-700 text-lg placeholder:text-slate-300 font-medium bg-transparent"
+                    autoFocus
+                  />
+                  
+                  {/* Bottom Controls */}
+                  <div className="flex items-center justify-between mt-4">
+                    <div className="flex items-center gap-3">
+                      <button type="button" className="flex items-center gap-1.5 text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">
+                        <Plus className="w-4 h-4" /> Certificate
+                      </button>
+                      <select className="text-sm font-bold text-slate-600 bg-transparent outline-none cursor-pointer hover:text-indigo-600">
+                        <option>Light AI</option>
+                        <option>Pro AI</option>
+                      </select>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <button type="button" className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors">
+                        <Mic className="w-5 h-5" />
+                      </button>
+                      <Button 
+                        type="submit" 
+                        disabled={!prompt.trim() || isGenerating}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-6 font-bold shadow-md shadow-indigo-600/20 transition-all h-12 flex items-center gap-2"
+                      >
+                        {isGenerating ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-4 h-4" />
+                        )}
+                        Generate
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </motion.div>
+            
+            {/* Template Previews Grid */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mt-16 w-full max-w-5xl"
             >
-              <Button size="lg" className="w-full sm:w-auto h-14 px-8 text-base bg-blue-600 hover:bg-blue-700 text-white rounded-full font-bold shadow-xl transition-all hover:shadow-blue-500/25 hover:-translate-y-1 group" asChild>
-                <Link href="/auth/signup">
-                  Start generating free 
-                  <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
+              <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex-shrink-0 px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-sm font-bold cursor-pointer">All Templates</div>
+                <div className="flex-shrink-0 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-bold cursor-pointer hover:bg-slate-50">Corporate</div>
+                <div className="flex-shrink-0 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-bold cursor-pointer hover:bg-slate-50">Academic</div>
+                <div className="flex-shrink-0 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-bold cursor-pointer hover:bg-slate-50">Modern</div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                {/* Template 1 */}
+                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-white aspect-[4/3] shadow-sm hover:shadow-xl transition-all cursor-pointer">
+                  <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 mb-4 border-2 border-indigo-600 rounded-full flex items-center justify-center text-indigo-600">
+                      <Award className="w-6 h-6" />
+                    </div>
+                    <h4 className={`${playfair.className} text-xl font-bold text-slate-900 mb-2`}>Certificate of Completion</h4>
+                    <p className="text-xs text-slate-500 font-medium">Modern corporate design</p>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 h-1 bg-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </div>
+                {/* Template 2 */}
+                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 aspect-[4/3] shadow-sm hover:shadow-xl transition-all cursor-pointer">
+                  <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center">
+                    <div className="w-16 h-16 mb-4 flex items-center justify-center text-amber-400">
+                      <Award className="w-12 h-12" strokeWidth={1} />
+                    </div>
+                    <h4 className={`${playfair.className} text-xl font-bold text-white mb-2`}>Certificate of Appreciation</h4>
+                    <p className="text-xs text-slate-400 font-medium">Classic dark theme</p>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </div>
+                {/* Template 3 */}
+                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-white aspect-[4/3] shadow-sm hover:shadow-xl transition-all cursor-pointer hidden sm:block">
+                  <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50 via-white to-white">
+                    <div className="w-12 h-12 mb-4 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
+                      <Layout className="w-6 h-6" />
+                    </div>
+                    <h4 className={`${playfair.className} text-xl font-bold text-slate-900 mb-2`}>Excellence Award</h4>
+                    <p className="text-xs text-slate-500 font-medium">Geometric & bold</p>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
