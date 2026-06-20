@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Playfair_Display } from 'next/font/google'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Card,
@@ -16,8 +15,7 @@ import {
 } from '@/components/ui/card'
 import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Send, Mail, Sparkles, Mic, RefreshCw, Plus } from 'lucide-react'
 
-// Load the serif font for headings
-const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700', '800'] })
+// Fonts managed via global styles now
 
 // Logos for infinite marquee
 const LOGOS = [
@@ -63,9 +61,10 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Features</Link>
-            <Link href="#how-it-works" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">How it works</Link>
-            <Link href="#pricing" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Pricing</Link>
+            <Link href="#builders" className="text-[13px] font-extrabold text-slate-600 hover:text-blue-600 transition-colors uppercase tracking-widest">Builders</Link>
+            <Link href="#templates" className="text-[13px] font-extrabold text-slate-600 hover:text-blue-600 transition-colors uppercase tracking-widest">Templates</Link>
+            <Link href="#resources" className="text-[13px] font-extrabold text-slate-600 hover:text-blue-600 transition-colors uppercase tracking-widest">Resources</Link>
+            <Link href="#pricing" className="text-[13px] font-extrabold text-slate-600 hover:text-blue-600 transition-colors uppercase tracking-widest">Pricing</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth/login" className="hidden sm:inline-flex text-sm font-bold text-slate-600 hover:text-slate-900">
@@ -112,7 +111,7 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className={`${playfair.className} text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-[1.1] tracking-tight max-w-4xl`}
+              className={`font-sans text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-[1.1] tracking-tight max-w-4xl`}
             >
               Free AI Certificate Generator
             </motion.h1>
@@ -217,7 +216,7 @@ export default function LandingPage() {
                     <div className="w-12 h-12 mb-4 border-2 border-indigo-600 rounded-full flex items-center justify-center text-indigo-600">
                       <Award className="w-6 h-6" />
                     </div>
-                    <h4 className={`${playfair.className} text-xl font-bold text-slate-900 mb-2`}>Certificate of Completion</h4>
+                    <h4 className={`font-sans text-xl font-bold text-slate-900 mb-2`}>Certificate of Completion</h4>
                     <p className="text-xs text-slate-500 font-medium">Modern corporate design</p>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 h-1 bg-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
@@ -228,7 +227,7 @@ export default function LandingPage() {
                     <div className="w-16 h-16 mb-4 flex items-center justify-center text-amber-400">
                       <Award className="w-12 h-12" strokeWidth={1} />
                     </div>
-                    <h4 className={`${playfair.className} text-xl font-bold text-white mb-2`}>Certificate of Appreciation</h4>
+                    <h4 className={`font-sans text-xl font-bold text-white mb-2`}>Certificate of Appreciation</h4>
                     <p className="text-xs text-slate-400 font-medium">Classic dark theme</p>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
@@ -239,7 +238,7 @@ export default function LandingPage() {
                     <div className="w-12 h-12 mb-4 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
                       <Layout className="w-6 h-6" />
                     </div>
-                    <h4 className={`${playfair.className} text-xl font-bold text-slate-900 mb-2`}>Excellence Award</h4>
+                    <h4 className={`font-sans text-xl font-bold text-slate-900 mb-2`}>Excellence Award</h4>
                     <p className="text-xs text-slate-500 font-medium">Geometric & bold</p>
                   </div>
                   <div className="absolute inset-x-0 bottom-0 h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
@@ -279,7 +278,7 @@ export default function LandingPage() {
         <section id="features" className="py-32 px-6 bg-slate-50">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+              <h2 className={`font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
                 Everything you need.
               </h2>
               <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
@@ -383,7 +382,7 @@ export default function LandingPage() {
           <div className="container mx-auto max-w-6xl">
             
             <div className="text-center mb-16">
-              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+              <h2 className={`font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
                 How it works
               </h2>
               <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
@@ -516,7 +515,7 @@ export default function LandingPage() {
         <section className="py-32 bg-slate-50 border-b border-slate-200 px-6">
           <div className="container mx-auto max-w-5xl">
             <div className="text-center mb-16">
-              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+              <h2 className={`font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
                 The CertiDraft Difference
               </h2>
               <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
@@ -585,118 +584,119 @@ export default function LandingPage() {
         </section>
 
         {/* ── 6. Pricing Section ──────────────────────────────────────────── */}
-        <section id="pricing" className="py-32 px-6 bg-white border-b border-slate-200">
+        <section id="pricing" className="py-32 px-6 bg-slate-50 border-b border-slate-200">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-20">
-              <h2 className={`${playfair.className} text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight`}>
+              <h2 className={`font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight`}>
                 Simple, transparent pricing
               </h2>
               <p className="text-lg text-slate-600 max-w-xl mx-auto font-medium">
-                Start for free, upgrade when you need to scale. No hidden fees.
+                Start generating for free. Upgrade when you need to scale. No hidden fees.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-center">
               
               {/* Starter */}
-              <Card className="flex flex-col h-full bg-slate-50 border-slate-200 shadow-sm rounded-3xl p-4">
-                <CardHeader className="p-6">
-                  <CardTitle className="text-2xl font-extrabold text-slate-900 tracking-tight">Starter</CardTitle>
-                  <CardDescription className="text-slate-500 font-medium text-base mt-2">For small events</CardDescription>
-                  <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-slate-400 font-bold text-2xl -translate-y-2">₱</span>
-                    <span className="text-6xl font-extrabold text-slate-900 tracking-tight">199</span>
-                    <span className="text-slate-500 font-medium ml-1">/mo</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 p-6">
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-blue-600 stroke-[3]" />
-                      <span className="text-slate-700 font-medium text-base">50 certificates</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-blue-600 stroke-[3]" />
-                      <span className="text-slate-700 font-medium text-base">Basic templates</span>
-                    </li>
-                  </ul>
-                </CardContent>
-                <CardFooter className="p-6 mt-auto">
-                  <Button variant="outline" className="w-full h-14 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-lg transition-colors" asChild>
-                    <Link href="/auth/signup">Get started</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+              <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Starter</h3>
+                <p className="text-slate-500 font-medium text-sm mt-2">For small events</p>
+                <div className="mt-6 flex items-baseline gap-1 mb-8">
+                  <span className="text-slate-400 font-bold text-xl -translate-y-2">₱</span>
+                  <span className="text-5xl font-extrabold text-slate-900 tracking-tight">199</span>
+                  <span className="text-slate-500 font-medium text-sm ml-1">/mo</span>
+                </div>
+                
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-indigo-500 stroke-[3]" />
+                    <span className="text-slate-700 font-medium text-sm">50 certificates / mo</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-indigo-500 stroke-[3]" />
+                    <span className="text-slate-700 font-medium text-sm">Basic templates</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-indigo-500 stroke-[3]" />
+                    <span className="text-slate-700 font-medium text-sm">Standard support</span>
+                  </li>
+                </ul>
+                
+                <Button variant="outline" className="w-full h-12 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-bold transition-colors" asChild>
+                  <Link href="/auth/signup">Get started</Link>
+                </Button>
+              </div>
 
               {/* Pro (Highlighted) */}
-              <Card className="flex flex-col h-full bg-slate-900 border-slate-800 shadow-2xl rounded-3xl p-4 relative transform md:-translate-y-4">
-                <div className="absolute top-0 inset-x-0 flex justify-center -translate-y-1/2">
-                  <span className="bg-blue-500 text-white text-xs font-extrabold tracking-widest uppercase px-6 py-2 rounded-full shadow-lg">
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.2)] transform md:scale-105 relative z-10">
+                <div className="absolute -top-4 inset-x-0 flex justify-center">
+                  <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-extrabold tracking-widest uppercase px-6 py-1.5 rounded-full shadow-lg">
                     Most Popular
                   </span>
                 </div>
                 
-                <CardHeader className="p-6">
-                  <CardTitle className="text-2xl font-extrabold text-white tracking-tight">Pro</CardTitle>
-                  <CardDescription className="text-slate-400 font-medium text-base mt-2">For growing organizations</CardDescription>
-                  <div className="mt-6 flex items-baseline gap-1 text-white">
-                    <span className="text-slate-500 font-bold text-2xl -translate-y-2">₱</span>
-                    <span className="text-6xl font-extrabold tracking-tight">599</span>
-                    <span className="text-slate-500 font-medium ml-1">/mo</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 p-6">
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-3 text-white">
-                       <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
-                       <span className="font-bold text-base">300 certificates</span>
-                    </li>
-                    <li className="flex items-center gap-3 text-slate-300">
-                       <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
-                       <span className="font-medium text-base">Custom branding</span>
-                    </li>
-                    <li className="flex items-center gap-3 text-slate-300">
-                       <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
-                       <span className="font-medium text-base">Email delivery</span>
-                    </li>
-                  </ul>
-                </CardContent>
-                <CardFooter className="p-6 mt-auto">
-                  <Button className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-900/50 transition-colors" asChild>
-                    <Link href="/auth/signup">Get started</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+                <h3 className="text-2xl font-extrabold text-white tracking-tight">Pro</h3>
+                <p className="text-slate-400 font-medium text-sm mt-2">For growing organizations</p>
+                <div className="mt-6 flex items-baseline gap-1 mb-8 text-white">
+                  <span className="text-slate-500 font-bold text-xl -translate-y-2">₱</span>
+                  <span className="text-6xl font-extrabold tracking-tight">599</span>
+                  <span className="text-slate-500 font-medium text-sm ml-1">/mo</span>
+                </div>
+                
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3 text-white">
+                     <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                     <span className="font-bold text-sm">300 certificates / mo</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                     <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                     <span className="font-medium text-sm">AI Template Generator</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                     <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                     <span className="font-medium text-sm">Custom branding & logos</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-slate-300">
+                     <Check className="w-5 h-5 text-blue-400 stroke-[3]" />
+                     <span className="font-medium text-sm">Automated email delivery</span>
+                  </li>
+                </ul>
+                
+                <Button className="w-full h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold shadow-lg shadow-blue-900/50 transition-colors" asChild>
+                  <Link href="/auth/signup">Get started</Link>
+                </Button>
+              </div>
 
               {/* Enterprise */}
-              <Card className="flex flex-col h-full bg-slate-50 border-slate-200 shadow-sm rounded-3xl p-4">
-                <CardHeader className="p-6">
-                  <CardTitle className="text-2xl font-extrabold text-slate-900 tracking-tight">Enterprise</CardTitle>
-                  <CardDescription className="text-slate-500 font-medium text-base mt-2">For huge scale ops</CardDescription>
-                  <div className="mt-6 flex items-baseline gap-1">
-                    <span className="text-slate-400 font-bold text-2xl -translate-y-2">₱</span>
-                    <span className="text-6xl font-extrabold text-slate-900 tracking-tight">1499</span>
-                    <span className="text-slate-500 font-medium ml-1">/mo</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 p-6">
-                  <ul className="space-y-4">
-                    <li className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-slate-400 stroke-[3]" />
-                      <span className="text-slate-700 font-medium text-base">1000+ certificates</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <Check className="w-5 h-5 text-slate-400 stroke-[3]" />
-                      <span className="text-slate-700 font-medium text-base">API Access</span>
-                    </li>
-                  </ul>
-                </CardContent>
-                <CardFooter className="p-6 mt-auto">
-                  <Button variant="outline" className="w-full h-14 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-lg transition-colors" asChild>
-                    <Link href="/auth/signup">Contact Sales</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
+              <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+                <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Enterprise</h3>
+                <p className="text-slate-500 font-medium text-sm mt-2">For huge scale operations</p>
+                <div className="mt-6 flex items-baseline gap-1 mb-8">
+                  <span className="text-slate-400 font-bold text-xl -translate-y-2">₱</span>
+                  <span className="text-5xl font-extrabold text-slate-900 tracking-tight">1499</span>
+                  <span className="text-slate-500 font-medium text-sm ml-1">/mo</span>
+                </div>
+                
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-indigo-500 stroke-[3]" />
+                    <span className="text-slate-700 font-bold text-sm">1000+ certificates</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-indigo-500 stroke-[3]" />
+                    <span className="text-slate-700 font-medium text-sm">Full API Access</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-indigo-500 stroke-[3]" />
+                    <span className="text-slate-700 font-medium text-sm">Dedicated account manager</span>
+                  </li>
+                </ul>
+                
+                <Button variant="outline" className="w-full h-12 bg-white border-2 border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-bold transition-colors" asChild>
+                  <Link href="/auth/signup">Contact Sales</Link>
+                </Button>
+              </div>
+
             </div>
           </div>
         </section>
@@ -704,23 +704,88 @@ export default function LandingPage() {
       </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="bg-slate-50 pt-20 pb-10">
+      <footer className="bg-[#1e293b] pt-20 pb-10 border-t border-slate-800">
         <div className="container mx-auto px-6 max-w-6xl">
-          <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-               <div className="h-6 w-6 bg-slate-900 rounded flex items-center justify-center">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-white"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          
+          {/* Top Footer: Brand & Description */}
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 border-b border-slate-700 pb-12 mb-12">
+            <div className="max-w-md">
+              <div className="flex items-center gap-2 mb-6">
+                 <div className="h-8 w-8 bg-blue-500 rounded flex items-center justify-center">
+                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-white"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                 </div>
+                 <span className="text-xl font-bold tracking-tight text-white">CertiDraft</span>
+              </div>
+              <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                CertiDraft's AI Certificate Builder and professional templates are designed to empower organizations, schools, and event organizers to create perfect credentials instantly.
+              </p>
+            </div>
+            
+            <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-8 font-bold shadow-lg transition-transform hover:-translate-y-1 h-12" asChild>
+               <Link href="/auth/signup">Build a certificate</Link>
+            </Button>
+          </div>
+
+          {/* Middle Footer: Link Columns */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-16 mb-16">
+            
+            {/* Column 1 */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-white font-extrabold text-sm tracking-wider uppercase mb-2">Builders</h4>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">AI Certificate Generator</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Visual Drag & Drop</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Bulk CSV Importer</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Verifiable Credentials</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">API Access</Link>
+            </div>
+            
+            {/* Column 2 */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-white font-extrabold text-sm tracking-wider uppercase mb-2">Templates</h4>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Corporate Certificates</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Academic Diplomas</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Awards of Excellence</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Course Completion</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Custom Formats</Link>
+            </div>
+
+            {/* Column 3 */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-white font-extrabold text-sm tracking-wider uppercase mb-2">Resources</h4>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Template Gallery</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Certificate Guide</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Help Center</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">API Documentation</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Blog</Link>
+            </div>
+
+            {/* Column 4 */}
+            <div className="flex flex-col gap-4">
+              <h4 className="text-white font-extrabold text-sm tracking-wider uppercase mb-2">Support</h4>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">About Us</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Pricing</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Contact Sales</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Terms of Service</Link>
+              <Link href="#" className="text-slate-400 hover:text-white text-sm font-medium transition-colors">Privacy Policy</Link>
+            </div>
+
+          </div>
+
+          {/* Bottom Footer: Trust & Copyright */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-slate-800">
+            
+            <div className="flex items-center gap-4">
+               <div className="flex items-center gap-1">
+                 {[...Array(5)].map((_, i) => <svg key={i} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#10B981" className="w-5 h-5"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>)}
                </div>
-               <span className="font-bold tracking-tight text-slate-900">CertiDraft</span>
+               <span className="text-slate-400 text-sm font-medium">Excellent reviews on <span className="font-bold text-white">Trustpilot</span></span>
             </div>
-            <div className="flex gap-6">
-              <a href="#" className="text-sm font-bold text-slate-500 hover:text-slate-900">Privacy</a>
-              <a href="#" className="text-sm font-bold text-slate-500 hover:text-slate-900">Terms</a>
-            </div>
-            <div className="text-sm text-slate-400 font-medium">
+
+            <div className="text-slate-500 text-sm font-medium text-center md:text-right">
               © {new Date().getFullYear()} CertiDraft. All rights reserved.
             </div>
           </div>
+
         </div>
       </footer>
     </div>
