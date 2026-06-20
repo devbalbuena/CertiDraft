@@ -80,9 +80,14 @@ export function DashboardChartsClient({ data }: DashboardChartsClientProps) {
       
       <CardContent className="pt-6 pb-2 flex-1 min-h-[300px]">
         {data.length === 0 || totalInPeriod === 0 ? (
-          <div className="h-full w-full flex flex-col items-center justify-center text-slate-400">
-            <Activity className="w-8 h-8 mb-3 opacity-20" />
-            <p className="text-sm font-medium">No generation activity yet.</p>
+          <div className="h-full w-full flex flex-col items-center justify-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200 py-12">
+            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-4 shadow-sm">
+               <Activity className="w-6 h-6 text-indigo-400" />
+            </div>
+            <p className="text-slate-900 font-extrabold text-[15px] mb-1">No activity yet</p>
+            <p className="text-slate-500 text-[13px] font-medium max-w-[250px] text-center leading-relaxed">
+              Create your first project to start tracking generation trends.
+            </p>
           </div>
         ) : (
           <div className="h-[260px] w-full">

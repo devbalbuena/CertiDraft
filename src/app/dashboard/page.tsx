@@ -39,28 +39,7 @@ function lastNDays(n: number): string[] {
   })
 }
 
-function Sparkline({ color = '#2563eb' }: { color?: string }) {
-  return (
-    <svg className="w-full h-8 mt-2" viewBox="0 0 100 20" preserveAspectRatio="none">
-      <path
-        d="M0,10 C20,20 40,0 60,10 C80,20 100,5"
-        fill="none"
-        stroke={color}
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function ProgressBar({ pct, colorClass = 'bg-blue-500' }: { pct: number, colorClass?: string }) {
-  return (
-    <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-6">
-      <div className={`h-full rounded-full ${colorClass}`} style={{ width: `${pct}%` }} />
-    </div>
-  )
-}
+// Render functions removed in favor of clean StatCard typography.
 
 function getStatusIcon(status: string) {
   switch (status) {
@@ -155,30 +134,34 @@ export default async function DashboardPage() {
   return (
     <div className="pb-12">
       
-      {/* ── Welcome Banner ─────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-8 sm:p-10 text-white shadow-md mb-8">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-2">
-              Welcome back, {firstName}!
-            </h1>
-            <p className="text-blue-100 max-w-xl text-[15px] font-medium leading-relaxed">
-              Your certificate drafting dashboard is ready. Create a new project to start generating credentials, or pick up where you left off.
-            </p>
-          </div>
+      {/* ── Premium Welcome Banner ─────────────────────────────────────────── */}
+      <div className="relative overflow-hidden rounded-3xl bg-white p-8 sm:p-10 shadow-[0_2px_20px_rgba(0,0,0,0.04)] border border-slate-100 mb-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+        {/* Left Side: Content */}
+        <div className="relative z-10 max-w-2xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl mb-3">
+            Welcome back, {firstName}!
+          </h1>
+          <p className="text-slate-500 text-[15px] font-medium leading-relaxed mb-6">
+            Your certificate drafting workspace is ready. Generate new credentials, track your batch progress, and manage templates all from your command center.
+          </p>
           <CreateProjectDialog
             trigger={
-              <Button className="bg-white text-indigo-700 hover:bg-slate-50 shadow-sm font-bold h-12 px-6 shrink-0 rounded-xl transition-transform active:scale-95">
+              <Button className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/20 font-bold h-12 px-6 rounded-xl transition-all active:scale-95">
                 <Plus className="w-5 h-5 mr-2" />
                 Create New Project
               </Button>
             }
           />
         </div>
-        {/* Background Decorative Icon */}
-        <div className="absolute -right-10 -top-24 opacity-10 pointer-events-none">
-          <Award className="w-80 h-80 text-white transform rotate-12" />
+        
+        {/* Right Side: Graphic/Accent */}
+        <div className="relative z-10 shrink-0 hidden md:flex items-center justify-center w-48 h-48 rounded-full bg-gradient-to-tr from-indigo-50 to-blue-50/50">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-100/50 via-transparent to-transparent opacity-50 blur-xl"></div>
+          <Award className="w-24 h-24 text-indigo-600/80 transform rotate-12 drop-shadow-sm" strokeWidth={1.5} />
         </div>
+
+        {/* Subtle Background Mesh/Gradient */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] bg-gradient-to-br from-blue-50/40 via-indigo-50/20 to-transparent rounded-full blur-3xl pointer-events-none"></div>
       </div>
 
       {/* ── Stats Row ──────────────────────────────────────────────────────── */}
@@ -188,47 +171,31 @@ export default async function DashboardPage() {
           value={totalCerts ?? 0}
           icon={Award}
           variant="primary"
-          trend={{ value: certsToday, label: 'new today', isPositive: true }}
-        >
-          <Sparkline color="#3b82f6" />
-        </StatCard>
+          trend={{ value: certsToday, label: 'new today', isPositive: true, showPlus: true }}
+        />
         
         <StatCard
           label="This Month"
           value={`${usedThisMonth} / ${planLimit}`}
           icon={CalendarDays}
           variant="destructive"
-          trend={{ value: 0, label: 'Limit usage', isPositive: false }}
-        >
-          <ProgressBar 
-            pct={progressPercentage} 
-            colorClass={progressPercentage >= 100 ? 'bg-red-500' : 'bg-amber-500'} 
-          />
-        </StatCard>
+          trend={{ value: `${progressPercentage.toFixed(0)}%`, label: 'Limit used', isPositive: progressPercentage < 100 }}
+        />
 
         <StatCard
           label="Current Plan"
           value={plan.charAt(0).toUpperCase() + plan.slice(1)}
           icon={CreditCard}
           variant="success"
-          trend={{ value: 100, label: 'Active', isPositive: true }}
-        >
-          <Link 
-            href="/dashboard/subscription" 
-            className="text-[13px] font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors mt-6 w-max"
-          >
-            Upgrade plan <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
-          </Link>
-        </StatCard>
+          trend={{ value: 'Active', label: 'Subscription', isPositive: true }}
+        />
 
         <StatCard
           label="Total Projects"
           value={totalProjects ?? 0}
           icon={FolderOpen}
-          variant="primary"
-        >
-          <Sparkline color="#8b5cf6" />
-        </StatCard>
+          variant="violet"
+        />
       </div>
 
       {/* ── Main Content Split ─────────────────────────────────────────────── */}
