@@ -63,7 +63,11 @@ CertiDraft is a comprehensive, full-stack certificate generation platform design
 - Feature gating (e.g., AI Citations and Email Delivery restricted to paid plans)
 
 **Admin & Security**
-- Role-based access control (RBAC) Admin panel
+- Comprehensive Role-Based Access Control (RBAC) Admin Panel
+- **User Management**: View, edit, and manage user accounts, roles, and subscription plans
+- **Template Management**: Create, edit, and manage global certificate templates available to all users
+- **System Settings**: Configure application-wide settings
+- **Analytics & Billing**: Monitor system usage, active subscriptions, and revenue metrics
 - Row Level Security (RLS) policies enforced via Supabase
 
 ## Tech Stack
