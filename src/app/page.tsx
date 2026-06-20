@@ -17,9 +17,17 @@ import { Check, ChevronRight, Award, Zap, Layout, Shield, FileText, Settings, Se
 
 // Fonts managed via global styles now
 
-// Logos for infinite marquee
+// Logos for infinite marquee — each with a unique brand color
 const LOGOS = [
-  "Acme Corp", "GlobalTech", "Pied Piper", "Hooli", "Initech", "Stark Ind.", "Wayne Ent.", "Umbrella Corp", "Massive Dynamic"
+  { name: "Acme Corp",       color: "#6366F1", bg: "#EEF2FF" },
+  { name: "GlobalTech",      color: "#0EA5E9", bg: "#E0F2FE" },
+  { name: "Pied Piper",      color: "#10B981", bg: "#D1FAE5" },
+  { name: "Hooli",           color: "#F59E0B", bg: "#FEF3C7" },
+  { name: "Initech",         color: "#EF4444", bg: "#FEE2E2" },
+  { name: "Stark Ind.",      color: "#8B5CF6", bg: "#EDE9FE" },
+  { name: "Wayne Ent.",      color: "#EC4899", bg: "#FCE7F3" },
+  { name: "Umbrella Corp",   color: "#DC2626", bg: "#FEE2E2" },
+  { name: "Massive Dynamic", color: "#14B8A6", bg: "#CCFBF1" },
 ]
 
 export default function LandingPage() {
@@ -194,15 +202,15 @@ export default function LandingPage() {
                 </div>
               </form>
             </motion.div>
-            
-            {/* Template Previews Grid */}
+
+            {/* Certificate Template Previews Grid */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
               className="mt-16 w-full max-w-5xl"
             >
-              <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="flex items-center gap-4 mb-6 overflow-x-auto pb-2">
                 <div className="flex-shrink-0 px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-full text-sm font-bold cursor-pointer">All Templates</div>
                 <div className="flex-shrink-0 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-bold cursor-pointer hover:bg-slate-50">Corporate</div>
                 <div className="flex-shrink-0 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-full text-sm font-bold cursor-pointer hover:bg-slate-50">Academic</div>
@@ -210,115 +218,187 @@ export default function LandingPage() {
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {/* Template 1 */}
-                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-white aspect-[4/3] shadow-sm hover:shadow-xl transition-all cursor-pointer">
-                  <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center">
-                    <div className="w-12 h-12 mb-4 border-2 border-indigo-600 rounded-full flex items-center justify-center text-indigo-600">
-                      <Award className="w-6 h-6" />
-                    </div>
-                    <h4 className={`font-sans text-xl font-bold text-slate-900 mb-2`}>Certificate of Completion</h4>
-                    <p className="text-xs text-slate-500 font-medium">Modern corporate design</p>
+
+
+                {/* Certificate Template 1 — Classic Corporate */}
+                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-white aspect-[4/3] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                  {/* Parchment gradient background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-amber-50/50"></div>
+                  {/* Double border frame */}
+                  <div className="absolute inset-[10px] border-2 border-amber-300/60 rounded-lg"></div>
+                  <div className="absolute inset-[14px] border border-amber-200/40 rounded-md"></div>
+                  {/* Corner ornaments */}
+                  <div className="absolute top-3 left-3 w-5 h-5 border-t-2 border-l-2 border-amber-400 rounded-tl"></div>
+                  <div className="absolute top-3 right-3 w-5 h-5 border-t-2 border-r-2 border-amber-400 rounded-tr"></div>
+                  <div className="absolute bottom-3 left-3 w-5 h-5 border-b-2 border-l-2 border-amber-400 rounded-bl"></div>
+                  <div className="absolute bottom-3 right-3 w-5 h-5 border-b-2 border-r-2 border-amber-400 rounded-br"></div>
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-8">
+                    <div className="w-8 h-8 mb-1 text-amber-500"><Award className="w-full h-full" strokeWidth={1.5} /></div>
+                    <div className="text-[9px] font-extrabold text-amber-700 uppercase tracking-[0.2em]">This certifies that</div>
+                    <div className="text-base font-bold text-slate-800">Jane Doe</div>
+                    <div className="text-[9px] text-slate-500 uppercase tracking-widest">has successfully completed</div>
+                    <div className="text-sm font-extrabold text-slate-900 text-center">Certificate of Completion</div>
+                    <div className="mt-2 w-16 h-px bg-amber-400"></div>
+                    <div className="text-[8px] text-slate-400 font-medium">Issued by CertiDraft • 2025</div>
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 h-1 bg-indigo-600 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-                </div>
-                {/* Template 2 */}
-                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 aspect-[4/3] shadow-sm hover:shadow-xl transition-all cursor-pointer">
-                  <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center">
-                    <div className="w-16 h-16 mb-4 flex items-center justify-center text-amber-400">
-                      <Award className="w-12 h-12" strokeWidth={1} />
-                    </div>
-                    <h4 className={`font-sans text-xl font-bold text-white mb-2`}>Certificate of Appreciation</h4>
-                    <p className="text-xs text-slate-400 font-medium">Classic dark theme</p>
+                  {/* Hover label */}
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-amber-600 to-amber-500 text-white text-xs font-bold py-2 text-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    Use this template
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 h-1 bg-amber-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
                 </div>
-                {/* Template 3 */}
-                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-white aspect-[4/3] shadow-sm hover:shadow-xl transition-all cursor-pointer hidden sm:block">
-                  <div className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50 via-white to-white">
-                    <div className="w-12 h-12 mb-4 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600">
-                      <Layout className="w-6 h-6" />
-                    </div>
-                    <h4 className={`font-sans text-xl font-bold text-slate-900 mb-2`}>Excellence Award</h4>
-                    <p className="text-xs text-slate-500 font-medium">Geometric & bold</p>
+
+                {/* Certificate Template 2 — Modern Dark */}
+                <div className="group relative rounded-2xl overflow-hidden border border-slate-700 bg-slate-900 aspect-[4/3] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/50 via-slate-900 to-blue-900/30"></div>
+                  {/* Glowing border effect */}
+                  <div className="absolute inset-[10px] border border-indigo-500/30 rounded-lg"></div>
+                  {/* Top accent line */}
+                  <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-8">
+                    <div className="w-10 h-10 mb-1 text-indigo-400"><Award className="w-full h-full" strokeWidth={1} /></div>
+                    <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-[0.2em]">Certificate of Appreciation</div>
+                    <div className="text-base font-bold text-white">John Smith</div>
+                    <div className="text-[9px] text-slate-500 uppercase tracking-widest">in recognition of excellence in</div>
+                    <div className="text-xs font-extrabold text-indigo-300 text-center">Outstanding Achievement Award</div>
+                    <div className="mt-2 w-16 h-px bg-indigo-500/60"></div>
+                    <div className="text-[8px] text-slate-500 font-medium">Issued by CertiDraft • 2025</div>
                   </div>
-                  <div className="absolute inset-x-0 bottom-0 h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-indigo-700 to-indigo-600 text-white text-xs font-bold py-2 text-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    Use this template
+                  </div>
                 </div>
+
+                {/* Certificate Template 3 — Modern Blue Geometric */}
+                <div className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-white aspect-[4/3] shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 cursor-pointer hidden sm:block">
+                  {/* Geometric accent shapes */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-blue-600 rounded-bl-[60px]"></div>
+                  <div className="absolute bottom-0 left-0 w-14 h-14 bg-blue-100 rounded-tr-[40px]"></div>
+                  <div className="absolute top-6 left-0 w-1.5 h-16 bg-blue-600 rounded-r-full"></div>
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 p-8">
+                    <div className="text-[9px] font-extrabold text-blue-600 uppercase tracking-[0.25em] mb-1">Excellence Award</div>
+                    <div className="text-base font-bold text-slate-900">Maria Garcia</div>
+                    <div className="text-[9px] text-slate-500 text-center">For exceptional performance and dedication to excellence in the workplace environment</div>
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="h-px w-8 bg-blue-200"></div>
+                      <div className="w-6 h-6 text-blue-600"><Award className="w-full h-full" strokeWidth={1.5} /></div>
+                      <div className="h-px w-8 bg-blue-200"></div>
+                    </div>
+                    <div className="text-[8px] text-slate-400 font-medium">Issued by CertiDraft • 2025</div>
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-blue-600 to-blue-500 text-white text-xs font-bold py-2 text-center transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                    Use this template
+                  </div>
+                </div>
+
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* ── 2. Infinite Trust Band ──────────────────────────────────────── */}
+        {/* ── 2. Infinite Trust Band ────────────────────────────────────── */}
         <section className="py-12 bg-white border-b border-slate-100 overflow-hidden flex flex-col items-center">
-           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 text-center">Trusted by forward-thinking teams</p>
+           <p className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.25em] mb-8 text-center">Trusted by forward-thinking teams</p>
            
-           <div className="relative w-full flex overflow-hidden group">
+           <div className="relative w-full flex overflow-hidden">
              <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10"></div>
              <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10"></div>
              
              <motion.div 
-                className="flex items-center gap-16 whitespace-nowrap px-8"
+                className="flex items-center gap-10 whitespace-nowrap px-8"
                 animate={{ x: ["0%", "-50%"] }}
-                transition={{ duration: 20, ease: "linear", repeat: Infinity }}
+                transition={{ duration: 25, ease: "linear", repeat: Infinity }}
              >
-                {/* Double the logos for seamless loop */}
                 {[...LOGOS, ...LOGOS].map((logo, i) => (
-                  <div key={i} className="flex items-center gap-3 opacity-40 hover:opacity-100 transition-opacity grayscale hover:grayscale-0">
-                    <div className="w-8 h-8 rounded bg-slate-200 flex items-center justify-center font-bold text-slate-500 text-xs">
-                      {logo.charAt(0)}
+                  <div
+                    key={i}
+                    className="group flex items-center gap-3 cursor-pointer px-4 py-2.5 rounded-xl transition-all duration-300 hover:scale-110"
+                    style={{ '--logo-color': logo.color, '--logo-bg': logo.bg } as React.CSSProperties}
+                  >
+                    {/* Colored initial badge */}
+                    <div
+                      className="w-9 h-9 rounded-lg flex items-center justify-center font-black text-sm shadow-sm transition-all duration-300 group-hover:shadow-md"
+                      style={{ backgroundColor: logo.bg, color: logo.color }}
+                    >
+                      {logo.name.charAt(0)}
                     </div>
-                    <span className="font-extrabold text-xl text-slate-800 tracking-tight">{logo}</span>
+                    {/* Colored company name */}
+                    <span
+                      className="font-extrabold text-lg tracking-tight transition-all duration-300"
+                      style={{ color: logo.color, opacity: 0.7 }}
+                      onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                      onMouseLeave={e => (e.currentTarget.style.opacity = '0.7')}
+                    >
+                      {logo.name}
+                    </span>
                   </div>
                 ))}
              </motion.div>
            </div>
         </section>
 
-        {/* ── 3. Bento Box Features Grid ──────────────────────────────────── */}
+        {/* ── 3. Features Grid ────────────────────────────────────────────── */}
         <section id="features" className="py-32 px-6 bg-slate-50">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <h2 className={`font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight`}>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-xs uppercase tracking-widest mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                Built for certificate makers
+              </div>
+              <h2 className="font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
                 Everything you need.
               </h2>
               <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto">
-                A complete toolkit to design, map, and distribute professional credentials.
+                A complete toolkit to{' '}
+                <span className="text-indigo-600 font-bold">design</span>,{' '}
+                <span className="text-blue-600 font-bold">map</span>, and{' '}
+                <span className="text-teal-600 font-bold">distribute</span>{' '}
+                professional credentials.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
               
               {/* Card 1: Visual Builder (Large) */}
               <motion.div 
                 whileHover={{ scale: 1.02 }}
                 className="md:col-span-2 md:row-span-2 bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden relative group"
               >
-                 <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-transparent"></div>
+                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-blue-50/30 to-transparent"></div>
+                 {/* Decorative blobs */}
+                 <div className="absolute -top-12 -right-12 w-48 h-48 bg-indigo-100 rounded-full opacity-40 blur-3xl"></div>
+                 <div className="absolute -bottom-8 -left-8 w-48 h-48 bg-blue-100 rounded-full opacity-40 blur-3xl"></div>
+                 
                  <div className="p-10 relative z-10">
-                   <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                   <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 text-white rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-indigo-200">
                      <Layout className="w-6 h-6" />
                    </div>
                    <h3 className="text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">Visual Builder</h3>
-                   <p className="text-slate-600 font-medium text-lg max-w-sm">Design pixel-perfect templates with our intuitive drag-and-drop canvas. Add custom fonts, dynamic variables, and logos.</p>
+                   <p className="text-slate-600 font-medium text-base max-w-sm leading-relaxed">Design pixel-perfect certificate templates with our intuitive drag-and-drop canvas. Add custom fonts, dynamic variables, and logos.</p>
                  </div>
                  
-                 {/* Abstract UI Mockup */}
-                 <div className="absolute right-0 bottom-0 w-[70%] h-[60%] bg-white border-t border-l border-slate-200 shadow-2xl rounded-tl-2xl p-6 transition-transform group-hover:-translate-y-2 group-hover:-translate-x-2">
-                    <div className="w-full h-full border-2 border-dashed border-slate-300 rounded-xl flex items-center justify-center bg-slate-50 relative overflow-hidden">
-                       {/* Floating elements */}
+                 {/* Certificate mockup */}
+                 <div className="absolute right-0 bottom-0 w-[65%] h-[58%] bg-white border-t border-l border-indigo-100 shadow-2xl rounded-tl-2xl p-5 transition-transform duration-500 group-hover:-translate-y-3 group-hover:-translate-x-3">
+                    {/* Mini certificate */}
+                    <div className="w-full h-full border-4 border-double border-indigo-200 rounded-xl flex flex-col items-center justify-center bg-gradient-to-br from-white to-indigo-50 relative overflow-hidden gap-2 p-4">
+                       <div className="absolute top-2 left-2 right-2 bottom-2 border border-indigo-100 rounded-lg pointer-events-none"></div>
+                       <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Certificate of Completion</div>
                        <motion.div 
-                          animate={{ y: [0, -10, 0] }} 
+                          animate={{ y: [0, -5, 0] }} 
                           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute top-1/4 left-1/4 px-4 py-2 bg-white shadow-lg border border-blue-200 rounded text-blue-600 font-mono font-bold text-sm"
+                          className="px-3 py-1 bg-white shadow-lg border border-indigo-200 rounded text-indigo-600 font-mono font-bold text-xs"
                         >
-                         {"{{first_name}}"}
+                         {'{{'}<span className="text-blue-500">first_name</span>{'}}'}
                        </motion.div>
                        <motion.div 
-                          animate={{ y: [0, 10, 0] }} 
+                          animate={{ y: [0, 5, 0] }} 
                           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                          className="absolute bottom-1/4 right-1/4 px-4 py-2 bg-white shadow-lg border border-indigo-200 rounded text-indigo-600 font-mono font-bold text-sm"
+                          className="px-3 py-1 bg-white shadow-lg border border-blue-200 rounded text-blue-600 font-mono font-bold text-xs"
                         >
-                         {"{{course_name}}"}
+                         {'{{'}<span className="text-indigo-500">course_name</span>{'}}'}
                        </motion.div>
                     </div>
                  </div>
@@ -327,46 +407,57 @@ export default function LandingPage() {
               {/* Card 2: Batch Processing */}
               <motion.div 
                 whileHover={{ scale: 1.02 }}
-                className="bg-slate-900 rounded-3xl border border-slate-800 shadow-xl overflow-hidden relative group text-white p-10 flex flex-col"
+                className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-3xl border border-indigo-900/50 shadow-xl overflow-hidden relative group text-white p-8 flex flex-col"
               >
-                 <div className="w-12 h-12 bg-white/10 text-white rounded-xl flex items-center justify-center mb-6">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+                 <div className="w-12 h-12 bg-blue-500/20 border border-blue-400/30 text-blue-300 rounded-xl flex items-center justify-center mb-5">
                    <FileText className="w-6 h-6" />
                  </div>
-                 <h3 className="text-2xl font-extrabold mb-3 tracking-tight">Batch Generation</h3>
-                 <p className="text-slate-400 font-medium leading-relaxed">Upload a CSV and let our engine map data to your template instantly. 1,000 PDFs in seconds.</p>
+                 <h3 className="text-xl font-extrabold mb-2 tracking-tight">Batch Generation</h3>
+                 <p className="text-slate-400 font-medium leading-relaxed text-sm">Upload a CSV and generate 1,000 personalised PDFs in seconds.</p>
                  
-                 <div className="mt-auto pt-8">
-                    <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                 <div className="mt-auto pt-6">
+                    <div className="flex justify-between text-xs mb-2">
+                      <span className="text-slate-400 font-mono">Generating...</span>
+                      <span className="text-blue-400 font-mono font-bold">1000/1000</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                        <motion.div 
-                         className="h-full bg-blue-500 rounded-full" 
+                         className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" 
                          initial={{ width: "0%" }} 
                          whileInView={{ width: "100%" }} 
                          transition={{ duration: 2, repeat: Infinity }}
                        />
                     </div>
-                    <p className="text-xs font-mono text-slate-500 mt-2 text-right">Processing 1000/1000</p>
+                    <div className="mt-4 flex gap-2">
+                      {['PDF', 'PNG', 'DOCX'].map(fmt => (
+                        <span key={fmt} className="text-[10px] font-bold text-blue-300 bg-blue-500/10 border border-blue-400/20 px-2 py-1 rounded">{fmt}</span>
+                      ))}
+                    </div>
                  </div>
               </motion.div>
 
-              {/* Card 3: Verifiable Security */}
+              {/* Card 3: Verifiable QR */}
               <motion.div 
                 whileHover={{ scale: 1.02 }}
-                className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden relative group p-10 flex flex-col"
+                className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden relative group p-8 flex flex-col"
               >
-                 <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6">
+                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent"></div>
+                 <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 text-white rounded-xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-200 relative z-10">
                    <Shield className="w-6 h-6" />
                  </div>
-                 <h3 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight">Verifiable QR</h3>
-                 <p className="text-slate-600 font-medium leading-relaxed">Every certificate gets a unique, cryptographically secure QR code for instant authenticity verification.</p>
+                 <h3 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight relative z-10">Verifiable QR</h3>
+                 <p className="text-slate-600 font-medium leading-relaxed text-sm relative z-10">Every certificate gets a unique QR code for instant authenticity verification.</p>
                  
-                 <div className="mt-auto self-center p-4 bg-white border border-slate-200 shadow-sm rounded-xl">
-                    <div className="grid grid-cols-4 gap-1">
-                      {[...Array(16)].map((_, i) => (
+                 <div className="mt-auto self-center p-3 bg-white border border-slate-200 shadow-sm rounded-xl relative z-10">
+                    <div className="grid grid-cols-5 gap-0.5">
+                      {[...Array(25)].map((_, i) => (
                         <motion.div 
                           key={i} 
-                          className="w-4 h-4 bg-slate-800 rounded-sm"
-                          animate={{ opacity: [1, 0.5, 1] }}
-                          transition={{ duration: 2, delay: i * 0.1, repeat: Infinity }}
+                          className="w-3.5 h-3.5 rounded-[2px]"
+                          style={{ backgroundColor: [0,1,5,6,10,14,15,19,20,24].includes(i) ? '#1e293b' : i%3===0 ? '#10b981' : '#e2e8f0' }}
+                          animate={{ opacity: [1, 0.6, 1] }}
+                          transition={{ duration: 2, delay: i * 0.08, repeat: Infinity }}
                         />
                       ))}
                     </div>
