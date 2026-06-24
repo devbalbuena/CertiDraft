@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { StatCard } from '@/components/layout/StatCard'
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog'
+import { AiQuickGenerate } from '@/components/dashboard/AiQuickGenerate'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { DashboardChartsClient, DailyCount } from './DashboardChartsClient'
@@ -134,35 +135,8 @@ export default async function DashboardPage() {
   return (
     <div className="pb-12">
       
-      {/* ── Premium Welcome Banner ─────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl bg-white p-8 sm:p-10 shadow-[0_2px_20px_rgba(0,0,0,0.04)] border border-slate-100 mb-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-        {/* Left Side: Content */}
-        <div className="relative z-10 max-w-2xl">
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl mb-3">
-            Welcome back, {firstName}!
-          </h1>
-          <p className="text-slate-500 text-[15px] font-medium leading-relaxed mb-6">
-            Your certificate drafting workspace is ready. Generate new credentials, track your batch progress, and manage templates all from your command center.
-          </p>
-          <CreateProjectDialog
-            trigger={
-              <Button className="bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-600/20 font-bold h-12 px-6 rounded-xl transition-all active:scale-95">
-                <Plus className="w-5 h-5 mr-2" />
-                Create New Project
-              </Button>
-            }
-          />
-        </div>
-        
-        {/* Right Side: Graphic/Accent */}
-        <div className="relative z-10 shrink-0 hidden md:flex items-center justify-center w-48 h-48 rounded-full bg-gradient-to-tr from-indigo-50 to-blue-50/50">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-100/50 via-transparent to-transparent opacity-50 blur-xl"></div>
-          <Award className="w-24 h-24 text-indigo-600/80 transform rotate-12 drop-shadow-sm" strokeWidth={1.5} />
-        </div>
-
-        {/* Subtle Background Mesh/Gradient */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[500px] h-[500px] bg-gradient-to-br from-blue-50/40 via-indigo-50/20 to-transparent rounded-full blur-3xl pointer-events-none"></div>
-      </div>
+      {/* ── AI Quick Generate / Onboarding ─────────────────────────────────── */}
+      <AiQuickGenerate isOnboarding={totalProjects === 0} />
 
       {/* ── Stats Row ──────────────────────────────────────────────────────── */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8 animate-stagger-children">

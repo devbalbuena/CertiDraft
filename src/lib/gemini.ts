@@ -65,3 +65,69 @@ function generateFallbackCitation(
   // Default / Formal
   return `This is to certify that ${recipientName} has successfully completed the requirements for ${achievement}. Conferred during the ${eventType}${org} in recognition of their demonstrated competence and commitment.`
 }
+
+export interface GeneratedProject {
+  projectName: string;
+  eventType: string; // 'Conference' | 'Training' | 'Academic' | 'Sports' | 'Workshop' | 'Other'
+  achievement: string;
+  citationText: string;
+  templateCategory: string; // 'Corporate' | 'Academic' | 'Sports' | 'Recognition'
+  tone: string; // 'formal' | 'warm' | 'inspiring'
+}
+
+export async function generateProject(description: string): Promise<GeneratedProject> {
+  const fallback: GeneratedProject = {
+    projectName: 'Generated Certificate',
+    eventType: 'Training',
+    achievement: 'Completion of Training',
+    citationText: 'This is to certify that the recipient has successfully completed the required training program and demonstrated competence in the subject matter.',
+    templateCategory: 'Corporate',
+    tone: 'formal'
+  }
+
+  try {
+    if (!GEMINI_API_KEY) {
+      console.warn('GEMINI_API_KEY is not set. Returning fallback project.')
+      return fallback
+    }
+
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+
+    const prompt = `
+You are an expert system that parses user requests for generating certificates.
+Analyze the following description:
+"${description}"
+
+Return a raw JSON object (with NO markdown formatting, NO \`\`\`json blocks) containing exactly these keys:
+- projectName (string, a short suitable project name)
+- eventType (string, ONE OF: Conference, Training, Academic, Sports, Workshop, Other)
+- achievement (string, the specific award or completion text, e.g. "Advanced React Course" or "Employee of the Month")
+- citationText (string, 2 to 3 sentences recognizing the achievement)
+- templateCategory (string, ONE OF: Corporate, Academic, Sports, Recognition. Pick the best visual style fit)
+- tone (string, ONE OF: formal, warm, inspiring. Pick based on description intent)
+`.trim()
+
+    const result = await model.generateContent(prompt)
+    const response = await result.response
+    let text = response.text()
+    
+    // Clean up potential markdown formatting if model ignores instruction
+    text = text.replace(/^```json\n?/, '').replace(/^```\n?/, '').replace(/```$/, '').trim()
+
+    const parsed = JSON.parse(text)
+    
+    // Ensure all fields exist
+    return {
+      projectName: parsed.projectName || fallback.projectName,
+      eventType: parsed.eventType || fallback.eventType,
+      achievement: parsed.achievement || fallback.achievement,
+      citationText: parsed.citationText || fallback.citationText,
+      templateCategory: parsed.templateCategory || fallback.templateCategory,
+      tone: parsed.tone || fallback.tone,
+    }
+  } catch (error) {
+    console.error('Error in generateProject:', error)
+    return fallback
+  }
+}

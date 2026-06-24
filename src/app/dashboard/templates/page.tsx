@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LayoutTemplate, Star } from 'lucide-react'
 import Link from 'next/link'
+import { UseTemplateDialog } from '@/components/templates/UseTemplateDialog'
 
 type Template = {
   id: string
@@ -81,11 +82,15 @@ function TemplateCard({ template, currentUserId }: { template: Template; current
         )}
 
         <div className="mt-4">
-          <Button asChild className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg h-10 text-sm shadow-sm">
-            <Link href={`/dashboard/projects?template=${template.id}`}>
-              Use Template
-            </Link>
-          </Button>
+          <UseTemplateDialog
+            templateId={template.id}
+            templateCategory={template.category}
+            trigger={
+              <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg h-10 text-sm shadow-sm cursor-pointer">
+                Use Template
+              </Button>
+            }
+          />
         </div>
       </div>
     </div>

@@ -144,6 +144,23 @@ export function Sidebar() {
         ) : (
           <div className="mt-6 mb-2 mx-auto h-px w-6 bg-slate-200" />
         )}
+
+        <Link
+          href="/dashboard/certificates"
+          title={isCollapsed ? 'All Certificates' : undefined}
+          className={cn(
+            'group relative flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium transition-all duration-200',
+            pathname === '/dashboard/certificates'
+              ? 'bg-blue-50/80 text-blue-700'
+              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+          )}
+        >
+          {pathname === '/dashboard/certificates' && (
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-600 rounded-r-full" />
+          )}
+          <Award className={cn("h-4 w-4 shrink-0 transition-colors", pathname === '/dashboard/certificates' ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600")} />
+          {!isCollapsed && <span className="truncate">All Certificates</span>}
+        </Link>
       </div>
 
       {/* ── Secondary Navigation ─────────────────────────────────────────── */}
