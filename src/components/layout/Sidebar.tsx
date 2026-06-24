@@ -28,7 +28,6 @@ const PRIMARY_NAV = [
 
 const SECONDARY_NAV = [
   { title: 'Subscription', href: '/dashboard/subscription', icon: CreditCard },
-  { title: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
 export function Sidebar() {

@@ -113,10 +113,7 @@ export function Topbar() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-slate-100" />
             <DropdownMenuItem className="text-slate-700 focus:bg-slate-50 focus:text-slate-900 cursor-pointer" asChild>
-              <a href="/dashboard/settings">Profile Settings</a>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-slate-700 focus:bg-slate-50 focus:text-slate-900 cursor-pointer" asChild>
-              <a href="/dashboard/subscription">Billing</a>
+              <a href="/dashboard/settings">Settings</a>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-slate-100" />
             <DropdownMenuItem onClick={() => signOut()} className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer font-medium">
