@@ -8,10 +8,8 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
-import { ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowLeft, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react'
 
 // ── Dynamically import the entire builder shell to ensure ssr:false ────────────
 const CertificateBuilder = dynamic(
@@ -19,10 +17,10 @@ const CertificateBuilder = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex-1 flex items-center justify-center" style={{ height: 'calc(100vh - 64px)' }}>
-        <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <div className="h-8 w-8 rounded-full border-2 border-muted border-t-primary animate-spin" />
-          <span className="text-sm">Initialising certificate builder…</span>
+      <div className="flex-1 flex items-center justify-center bg-[#0f172a]" style={{ height: 'calc(100vh - 48px)' }}>
+        <div className="flex flex-col items-center gap-3 text-slate-500">
+          <div className="h-8 w-8 rounded-full border-2 border-slate-700 border-t-indigo-500 animate-spin" />
+          <span className="text-sm font-medium">Initialising certificate builder…</span>
         </div>
       </div>
     ),
@@ -59,40 +57,42 @@ export function DesignPageClient({ projectId, projectName, initialData }: Design
   }, [projectId])
 
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* ── Header bar ──────────────────────────────────────────────────── */}
-      <header className="h-16 shrink-0 flex items-center gap-4 px-4 border-b border-border bg-card z-10">
-        <Button variant="ghost" size="sm" asChild className="-ml-1">
-          <Link href={`/dashboard/projects/${projectId}`}>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Link>
-        </Button>
+    <div className="flex flex-col h-screen bg-[#0f172a]">
+      {/* ── Slim Dark Header ──────────────────────────────────────────────── */}
+      <header className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-slate-800 bg-[#1e293b] z-20">
+        {/* Back link */}
+        <Link
+          href={`/dashboard/projects/${projectId}`}
+          className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-xs font-medium"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+          Dashboard
+        </Link>
 
-        <div className="w-px h-5 bg-border" />
-
-        <h1 className="font-semibold text-sm truncate max-w-[260px]">
-          {projectName}
-        </h1>
-
-        <span className="text-xs text-muted-foreground">— Certificate Builder</span>
+        {/* Breadcrumb */}
+        <span className="text-slate-700 text-xs">/</span>
+        <span className="text-slate-400 text-xs">Design</span>
+        <span className="text-slate-700 text-xs">/</span>
+        <span className="text-slate-200 text-xs font-semibold truncate max-w-[180px]">{projectName}</span>
+        <span className="text-slate-600 text-xs hidden sm:inline">— Certificate Builder</span>
 
         <div className="flex-1" />
 
+        {/* Save state indicators */}
         {saveState === 'saving' && (
-          <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-full border border-muted-foreground border-t-foreground animate-spin" />
+          <span className="text-xs text-slate-400 flex items-center gap-1.5">
+            <Loader2 className="h-3 w-3 animate-spin" />
             Saving…
           </span>
         )}
         {saveState === 'saved' && (
-          <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1.5">
+          <span className="text-xs text-emerald-400 flex items-center gap-1.5">
             <CheckCircle2 className="h-3.5 w-3.5" />
             Saved
           </span>
         )}
         {saveState === 'error' && (
-          <span className="text-xs text-destructive flex items-center gap-1.5">
+          <span className="text-xs text-red-400 flex items-center gap-1.5">
             <AlertCircle className="h-3.5 w-3.5" />
             Save failed
           </span>
@@ -107,3 +107,4 @@ export function DesignPageClient({ projectId, projectName, initialData }: Design
     </div>
   )
 }
+

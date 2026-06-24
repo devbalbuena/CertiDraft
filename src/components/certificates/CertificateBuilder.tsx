@@ -11,10 +11,10 @@ const CertificateCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex-1 flex items-center justify-center bg-zinc-900">
-        <div className="flex flex-col items-center gap-3 text-zinc-400">
-          <div className="h-8 w-8 rounded-full border-2 border-zinc-600 border-t-indigo-500 animate-spin" />
-          <span className="text-sm">Loading canvas…</span>
+      <div className="flex-1 flex items-center justify-center bg-[#111827]">
+        <div className="flex flex-col items-center gap-3 text-slate-500">
+          <div className="h-8 w-8 rounded-full border-2 border-slate-700 border-t-indigo-500 animate-spin" />
+          <span className="text-sm font-medium">Loading canvas…</span>
         </div>
       </div>
     ),
@@ -28,23 +28,26 @@ interface CertificateBuilderProps {
 
 export function CertificateBuilder({ onSave, initialData }: CertificateBuilderProps) {
   return (
-    // Full viewport minus topbar (h-16 = 64px)
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 64px)' }}>
-      {/* ── Top Toolbar ─────────────────────────────────────────────────── */}
+    // Full viewport minus top header bar (h-12 = 48px)
+    <div className="flex flex-col bg-[#0f172a]" style={{ height: 'calc(100vh - 48px)' }}>
+
+      {/* ── Contextual Toolbar ──────────────────────────────────────────── */}
       <BuilderToolbar onSave={onSave} />
 
-      {/* ── Three-column shell ───────────────────────────────────────────── */}
+      {/* ── Three-column workspace ──────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left: Layers */}
+
+        {/* Left: Tabbed Layers / Elements / Variables panel */}
         <BuilderLayersPanel />
 
-        {/* Center: Canvas */}
-        <div className="flex-1 overflow-hidden">
+        {/* Center: Canvas on dark background */}
+        <div className="flex-1 overflow-hidden bg-[#111827]">
           <CertificateCanvas initialData={initialData} />
         </div>
 
-        {/* Right: Properties */}
+        {/* Right: Properties panel */}
         <BuilderPropertiesPanel />
+
       </div>
     </div>
   )
