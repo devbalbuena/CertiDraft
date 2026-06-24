@@ -171,6 +171,38 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
     }
   }
 
+  const handleDownloadPDF = () => {
+    if (!canvas) return
+    const originalZoom = canvas.getZoom()
+    const originalVpt = [...canvas.viewportTransform!] as fabric.TMat2D
+    
+    // Reset zoom and viewport to capture the exact canvas dimensions
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0] as fabric.TMat2D)
+    canvas.setZoom(1)
+    
+    // Export at 2x multiplier for better quality in the PDF
+    const dataURL = canvas.toDataURL({ format: 'jpeg', quality: 1, multiplier: 2 })
+    
+    // Restore zoom and viewport
+    canvas.setViewportTransform(originalVpt)
+    canvas.setZoom(originalZoom)
+    
+    // jsPDF uses points by default, so we set unit to 'px' and use canvas dimensions
+    import('jspdf').then(({ jsPDF }) => {
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [canvas.width || 842, canvas.height || 595]
+      })
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = pdf.internal.pageSize.getHeight()
+      
+      pdf.addImage(dataURL, 'JPEG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save('certificate.pdf')
+    })
+  }
+
   const handleGenerateCitation = async () => {
     setIsGenerating(true)
     setAiError('')
@@ -346,7 +378,7 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
 
       <div className="flex-1" />
 
-      {/* Preview + Save */}
+      {/* Preview + Download + Save */}
       <div className="flex items-center gap-2">
         <button
           onClick={handlePreview}
@@ -354,6 +386,14 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
         >
           <Eye className="h-3.5 w-3.5" />
           Preview
+        </button>
+        <button
+          onClick={handleDownloadPDF}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold transition-all"
+          title="Download as PDF"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          PDF
         </button>
         <button
           onClick={handleSave}
