@@ -25,10 +25,10 @@ const PLAN_PRICES: Record<string, number> = {
 }
 
 const PLAN_COLORS: Record<string, string> = {
-  free: 'bg-slate-100 text-slate-700',
-  starter: 'bg-blue-50 text-blue-700',
-  pro: 'bg-violet-50 text-violet-700',
-  enterprise: 'bg-amber-50 text-amber-700',
+  free: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  starter: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  pro: 'bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+  enterprise: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -85,9 +85,9 @@ export default async function AdminBillingPage() {
       />
 
       {/* ── Important disclaimer ───────────────────────────────────────────── */}
-      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
-        <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
-        <p className="text-sm font-medium text-amber-900">
+      <div className="flex items-start gap-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-950/20 p-4">
+        <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-500 mt-0.5 shrink-0" />
+        <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
           Billing data is calculated from current plan assignments. Payment
           processor integration is not yet connected. All revenue figures are
           estimates only.
@@ -119,7 +119,7 @@ export default async function AdminBillingPage() {
       {/* ── Revenue by Plan ───────────────────────────────────────────────── */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold text-slate-700">
+          <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             Revenue Breakdown by Plan
           </CardTitle>
         </CardHeader>
@@ -135,13 +135,13 @@ export default async function AdminBillingPage() {
                 </Badge>
               </div>
               <div className="flex-1">
-                <div className="flex justify-between text-sm text-slate-600 mb-1">
+                <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400 mb-1">
                   <span>{count} users × ₱{price.toLocaleString()}</span>
-                  <span className="font-bold text-slate-800">
+                  <span className="font-bold text-slate-800 dark:text-slate-200">
                     ₱{total.toLocaleString()}
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-blue-500"
                     style={{ width: mrr > 0 ? `${(total / mrr) * 100}%` : '0%' }}
@@ -161,7 +161,7 @@ export default async function AdminBillingPage() {
       {/* ── Paid Users Table ──────────────────────────────────────────────── */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm font-semibold text-slate-700">
+          <CardTitle className="text-sm font-semibold text-slate-700 dark:text-slate-200">
             Paid Subscribers
           </CardTitle>
         </CardHeader>
@@ -173,7 +173,7 @@ export default async function AdminBillingPage() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="bg-slate-50">
+                <TableRow className="bg-slate-50 dark:bg-slate-900/50">
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Plan</TableHead>
@@ -189,10 +189,10 @@ export default async function AdminBillingPage() {
                   const isActive = expiry ? expiry > now : true
                   return (
                     <TableRow key={u.id}>
-                      <TableCell className="font-medium text-slate-800">
+                      <TableCell className="font-medium text-slate-800 dark:text-slate-200">
                         {u.full_name ?? '—'}
                       </TableCell>
-                      <TableCell className="text-slate-600">{u.email}</TableCell>
+                      <TableCell className="text-slate-600 dark:text-slate-400">{u.email}</TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
@@ -201,7 +201,7 @@ export default async function AdminBillingPage() {
                           {u.plan}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-slate-500 text-sm">
+                      <TableCell className="text-slate-500 dark:text-slate-400 text-sm">
                         {expiry ? expiry.toLocaleDateString() : '—'}
                       </TableCell>
                       <TableCell>
@@ -209,8 +209,8 @@ export default async function AdminBillingPage() {
                           variant="secondary"
                           className={
                             isActive
-                              ? 'bg-emerald-50 text-emerald-700'
-                              : 'bg-red-50 text-red-700'
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                              : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                           }
                         >
                           {isActive ? 'Active' : 'Expired'}
@@ -227,9 +227,9 @@ export default async function AdminBillingPage() {
 
       {/* ── Churned Users ─────────────────────────────────────────────────── */}
       {churnedUsers.length > 0 && (
-        <Card className="border-red-100">
+        <Card className="border-red-100 dark:border-red-900/50">
           <CardHeader>
-            <CardTitle className="text-sm font-semibold text-red-700 flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold text-red-700 dark:text-red-400 flex items-center gap-2">
               <TrendingDown className="w-4 h-4" />
               Churned Users (Last 30 Days)
             </CardTitle>
@@ -237,7 +237,7 @@ export default async function AdminBillingPage() {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
-                <TableRow className="bg-red-50/50">
+                <TableRow className="bg-red-50/50 dark:bg-red-900/10">
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Plan Expired</TableHead>
@@ -246,9 +246,9 @@ export default async function AdminBillingPage() {
               <TableBody>
                 {churnedUsers.map((u) => (
                   <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.full_name ?? '—'}</TableCell>
-                    <TableCell className="text-slate-600">{u.email}</TableCell>
-                    <TableCell className="text-red-600 text-sm font-medium">
+                    <TableCell className="font-medium dark:text-slate-200">{u.full_name ?? '—'}</TableCell>
+                    <TableCell className="text-slate-600 dark:text-slate-400">{u.email}</TableCell>
+                    <TableCell className="text-red-600 dark:text-red-400 text-sm font-medium">
                       {u.plan_expires_at
                         ? new Date(u.plan_expires_at).toLocaleDateString()
                         : '—'}

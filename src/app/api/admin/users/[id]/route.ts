@@ -38,26 +38,32 @@ export async function PATCH(
 
   const { id } = await params
 
-  // Prevent an admin from demoting themselves
-  if (id === admin.id) {
-    const body = await request.json()
-    if (body.role && body.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'You cannot remove your own admin role.' },
-        { status: 400 }
-      )
-    }
-  }
-
   const body = await request.json()
   const parsed = patchSchema.safeParse(body)
+
+  // Prevent an admin from demoting themselves
+  if (id === admin.id && parsed.success && parsed.data.role === 'user') {
+    return NextResponse.json(
+      { error: 'You cannot remove your own admin role.' },
+      { status: 400 }
+    )
+  }
 
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
-  const updates: Record<string, string> = {}
-  if (parsed.data.plan) updates.plan = parsed.data.plan
+  const updates: Record<string, any> = {}
+  if (parsed.data.plan) {
+    updates.plan = parsed.data.plan
+    if (parsed.data.plan === 'free') {
+      updates.plan_expires_at = null
+    } else {
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 30)
+      updates.plan_expires_at = expiry.toISOString()
+    }
+  }
   if (parsed.data.role) updates.role = parsed.data.role
 
   if (Object.keys(updates).length === 0) {

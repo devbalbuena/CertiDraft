@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { CheckCircle2, Crown, Zap, Shield, Loader2 } from 'lucide-react'
+import { CheckCircle2, Crown, Zap, Shield, Loader2, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -9,6 +9,14 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { PLAN_LIMITS, PlanType, checkPlanLimit } from '@/lib/subscriptions'
 
 const PLANS = [
@@ -73,7 +81,9 @@ export default function SubscriptionPage() {
   const supabase = createClient()
   const [currentPlan, setCurrentPlan] = React.useState<PlanType>('free')
   const [usedThisMonth, setUsedThisMonth] = React.useState(0)
+  const [expiresAt, setExpiresAt] = React.useState<string | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
+  const [upgradeDialogPlan, setUpgradeDialogPlan] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     async function loadPlan() {
@@ -81,13 +91,14 @@ export default function SubscriptionPage() {
       if (user) {
         const { data: profile } = await supabase
           .from('users')
-          .select('plan, certificates_this_month')
+          .select('plan, certificates_this_month, plan_expires_at')
           .eq('id', user.id)
           .single()
         
         if (profile) {
           setCurrentPlan((profile.plan as PlanType) || 'free')
           setUsedThisMonth(profile.certificates_this_month || 0)
+          setExpiresAt(profile.plan_expires_at)
         }
       }
       setIsLoading(false)
@@ -96,9 +107,7 @@ export default function SubscriptionPage() {
   }, [])
 
   const handleUpgrade = (planName: string) => {
-    toast.info('Payment Integration Coming Soon', {
-      description: `Please contact support to upgrade to the ${planName} plan.`
-    })
+    setUpgradeDialogPlan(planName)
   }
 
   const simulateUpgrade = async (planId: PlanType) => {
@@ -120,6 +129,11 @@ export default function SubscriptionPage() {
   const limitData = checkPlanLimit(currentPlan, usedThisMonth)
   const progressPercent = Math.min(100, Math.round((usedThisMonth / limitData.limit) * 100))
 
+  const expiryDate = expiresAt ? new Date(expiresAt) : null
+  const daysUntilExpiry = expiryDate ? Math.ceil((expiryDate.getTime() - new Date().getTime()) / (1000 * 3600 * 24)) : null
+  const isExpiringSoon = daysUntilExpiry !== null && daysUntilExpiry <= 7 && daysUntilExpiry >= 0
+  const isExpired = daysUntilExpiry !== null && daysUntilExpiry < 0
+
   return (
     <div className="space-y-8 pb-12">
       <PageHeader 
@@ -130,22 +144,38 @@ export default function SubscriptionPage() {
       {/* Usage Bar */}
       <Card className="bg-muted/30">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Current Usage</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Current Usage</CardTitle>
+            {expiryDate && (
+              <Badge variant={isExpired ? 'destructive' : isExpiringSoon ? 'default' : 'secondary'} className={isExpiringSoon && !isExpired ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 hover:bg-amber-100' : ''}>
+                {isExpired ? 'Plan Expired' : isExpiringSoon ? `Expires in ${daysUntilExpiry} days` : `Renews ${expiryDate.toLocaleDateString()}`}
+              </Badge>
+            )}
+          </div>
           <CardDescription>
             You are on the <span className="font-semibold capitalize">{currentPlan}</span> plan.
             Your limits reset at the start of every billing cycle.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <div className="flex justify-between text-sm font-medium">
-            <span>Certificates Generated</span>
-            <span>{usedThisMonth} / {limitData.limit}</span>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm font-medium">
+              <span>Certificates Generated</span>
+              <span>{usedThisMonth} / {limitData.limit}</span>
+            </div>
+            <Progress value={progressPercent} className={`h-2 ${progressPercent >= 100 ? 'bg-destructive/20' : ''}`} />
+            {progressPercent >= 100 && (
+              <p className="text-sm text-destructive mt-2">
+                You have reached your monthly limit. Please upgrade your plan to continue generating certificates.
+              </p>
+            )}
           </div>
-          <Progress value={progressPercent} className={`h-2 ${progressPercent >= 100 ? 'bg-destructive/20' : ''}`} />
-          {progressPercent >= 100 && (
-            <p className="text-sm text-destructive mt-2">
-              You have reached your monthly limit. Please upgrade your plan to continue generating certificates.
-            </p>
+
+          {isExpiringSoon && !isExpired && (
+            <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg border border-amber-200 dark:border-amber-900">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <p>Your subscription is expiring soon. Please contact your administrator or support to renew.</p>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -219,6 +249,34 @@ export default function SubscriptionPage() {
           )
         })}
       </div>
+
+      <Dialog open={!!upgradeDialogPlan} onOpenChange={(open) => !open && setUpgradeDialogPlan(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Upgrade to {upgradeDialogPlan}</DialogTitle>
+            <DialogDescription>
+              We are currently onboarding enterprise customers manually while we integrate our automated payment systems.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              To upgrade your account to the <strong>{upgradeDialogPlan}</strong> plan immediately, please contact your platform administrator or our sales team.
+            </p>
+            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200">
+              sales@certidraft.com
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUpgradeDialogPlan(null)}>Close</Button>
+            <Button onClick={() => {
+              window.location.href = 'mailto:sales@certidraft.com'
+              setUpgradeDialogPlan(null)
+            }}>
+              Contact Sales
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
