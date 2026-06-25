@@ -23,7 +23,8 @@ import {
   AlignCenter,
   AlignRight,
   Paintbrush,
-  Move,
+  Plus,
+  Loader2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -36,9 +37,64 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
   )
 }
 
+const DEFAULT_FONTS = ['Inter', 'Georgia', 'Times New Roman', 'Arial', 'Courier New', 'Playfair Display']
+
 export function BuilderPropertiesPanel() {
   const { canvas, selectedElement, pushHistory } = useCanvasStore()
   const [, setTick] = React.useState(0)
+  const [isUploadingFont, setIsUploadingFont] = React.useState(false)
+  const [customFonts, setCustomFonts] = React.useState<string[]>([])
+  const fontInputRef = React.useRef<HTMLInputElement>(null)
+
+  // Sync custom fonts from canvas store on mount and when canvas changes
+  React.useEffect(() => {
+    if (canvas) {
+      const stored: Array<{ name: string }> = (canvas as any).customFonts || []
+      setCustomFonts(stored.map((f) => f.name))
+    }
+  }, [canvas])
+
+  const handleFontUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !canvas) return
+
+    setIsUploadingFont(true)
+    const fontName = file.name.replace(/\.[^.]+$/, '') // strip extension
+    const reader = new FileReader()
+
+    reader.onload = async (ev) => {
+      const dataUrl = ev.target?.result as string
+      try {
+        const fontFace = new FontFace(fontName, `url(${dataUrl})`)
+        const loaded = await fontFace.load()
+        document.fonts.add(loaded)
+
+        // Persist in canvas so it saves with the JSON
+        const existing: Array<{ name: string; dataUrl: string }> = (canvas as any).customFonts || []
+        if (!existing.find((f) => f.name === fontName)) {
+          ;(canvas as any).customFonts = [...existing, { name: fontName, dataUrl }]
+        }
+
+        setCustomFonts((prev) => (prev.includes(fontName) ? prev : [...prev, fontName]))
+
+        // Apply the new font to the currently selected text element
+        if (selectedElement) {
+          selectedElement.set('fontFamily' as any, fontName)
+          canvas.requestRenderAll()
+          pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode', 'aiContext', 'customFonts'])))
+        }
+
+        setTick((t) => t + 1)
+      } catch (err) {
+        console.error('Failed to load font:', err)
+      } finally {
+        setIsUploadingFont(false)
+        e.target.value = ''
+      }
+    }
+
+    reader.readAsDataURL(file)
+  }
 
   React.useEffect(() => {
     if (!canvas) return
@@ -148,7 +204,29 @@ export function BuilderPropertiesPanel() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-[11px] text-slate-500">Font Family</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-[11px] text-slate-500">Font Family</Label>
+                <button
+                  title="Upload custom font (.ttf, .otf, .woff)"
+                  onClick={() => fontInputRef.current?.click()}
+                  disabled={isUploadingFont}
+                  className="flex items-center gap-1 text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors disabled:opacity-50"
+                >
+                  {isUploadingFont ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Plus className="h-3 w-3" />
+                  )}
+                  Upload
+                </button>
+                <input
+                  ref={fontInputRef}
+                  type="file"
+                  accept=".ttf,.otf,.woff,.woff2"
+                  className="hidden"
+                  onChange={handleFontUpload}
+                />
+              </div>
               <Select
                 value={(selectedElement as any).fontFamily || 'Inter'}
                 onValueChange={(v) => updateProp('fontFamily', v)}
@@ -157,9 +235,19 @@ export function BuilderPropertiesPanel() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-[#1e293b] border-slate-700 text-slate-300">
-                  {['Inter', 'Georgia', 'Times New Roman', 'Arial', 'Courier New', 'Playfair Display'].map(f => (
+                  {DEFAULT_FONTS.map(f => (
                     <SelectItem key={f} value={f} className="text-xs hover:bg-slate-800">{f}</SelectItem>
                   ))}
+                  {customFonts.length > 0 && (
+                    <>
+                      <div className="px-2 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest border-t border-slate-700 mt-1 pt-2">Custom Fonts</div>
+                      {customFonts.map(f => (
+                        <SelectItem key={f} value={f} className="text-xs hover:bg-slate-800">
+                          {f} <span className="ml-1 text-[9px] text-indigo-400">↑</span>
+                        </SelectItem>
+                      ))}
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             </div>

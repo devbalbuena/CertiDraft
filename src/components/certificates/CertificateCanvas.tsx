@@ -36,6 +36,24 @@ export function CertificateCanvas({ initialData }: { initialData?: string | null
       if (initialData) {
         try {
           const parsed = JSON.parse(initialData)
+
+          // ── Load any custom fonts embedded in the saved design ─────────
+          if (parsed.customFonts && Array.isArray(parsed.customFonts)) {
+            await Promise.all(
+              parsed.customFonts.map(async ({ name, dataUrl }: { name: string; dataUrl: string }) => {
+                try {
+                  if (!document.fonts.check(`12px "${name}"`)) {
+                    const fontFace = new FontFace(name, `url(${dataUrl})`)
+                    const loaded = await fontFace.load()
+                    document.fonts.add(loaded)
+                  }
+                } catch {
+                  // Non-fatal — fallback to system font
+                }
+              })
+            )
+          }
+
           // Check again before awaiting: loadFromJSON calls clearRect internally,
           // which will throw if the canvas was disposed between here and await.
           if (disposed) return

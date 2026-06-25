@@ -153,7 +153,7 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
 
   const handleSave = () => {
     if (!canvas) return
-    const json = JSON.stringify((canvas as any).toJSON(['isQRCode', 'aiContext']))
+    const json = JSON.stringify((canvas as any).toJSON(['isQRCode', 'aiContext', 'customFonts']))
     onSave(json)
   }
 
