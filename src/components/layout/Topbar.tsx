@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
-import { Search, Bell, Menu } from 'lucide-react'
+import { Search, Bell, Menu, Sun, Moon } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,10 +18,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './Sidebar'
 import { AdminSidebar } from './AdminSidebar'
+import { useTheme } from '@/context/ThemeContext'
 
 export function Topbar() {
   const pathname = usePathname()
   const { user, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
   
   const isAdminArea = pathname.startsWith('/admin')
 
@@ -37,7 +39,7 @@ export function Topbar() {
   const title = currentSegment.charAt(0).toUpperCase() + currentSegment.slice(1)
 
   return (
-    <header className="h-16 border-b border-slate-200 bg-white z-30 sticky top-0 px-4 md:px-6 flex items-center justify-between gap-4">
+    <header className="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 z-30 sticky top-0 px-4 md:px-6 flex items-center justify-between gap-4 transition-colors duration-300">
       
       {/* Mobile Menu Trigger & Breadcrumb */}
       <div className="flex items-center gap-4">
@@ -84,7 +86,22 @@ export function Topbar() {
 
       {/* Right Side: Notifications & Profile */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-full">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {theme === 'dark' ? (
+            <Sun className="h-[18px] w-[18px]" />
+          ) : (
+            <Moon className="h-[18px] w-[18px]" />
+          )}
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+
+        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
           <Bell className="h-[18px] w-[18px]" />
           <span className="sr-only">Notifications</span>
         </Button>
@@ -100,23 +117,23 @@ export function Topbar() {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 rounded-xl border border-slate-200 shadow-lg" align="end" forceMount>
+          <DropdownMenuContent className="w-56 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-lg" align="end" forceMount>
             <DropdownMenuLabel className="font-normal p-3">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-semibold text-slate-900 leading-none">
+                <p className="text-sm font-semibold text-slate-900 dark:text-slate-100 leading-none">
                   {user?.user_metadata?.full_name || 'User'}
                 </p>
-                <p className="text-xs leading-none text-slate-500">
+                <p className="text-xs leading-none text-slate-500 dark:text-slate-400">
                   {user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-slate-100" />
-            <DropdownMenuItem className="text-slate-700 focus:bg-slate-50 focus:text-slate-900 cursor-pointer" asChild>
+            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+            <DropdownMenuItem className="text-slate-700 dark:text-slate-300 focus:bg-slate-50 dark:focus:bg-slate-800 focus:text-slate-900 dark:focus:text-slate-100 cursor-pointer" asChild>
               <a href="/dashboard/settings">Settings</a>
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slate-100" />
-            <DropdownMenuItem onClick={() => signOut()} className="text-red-600 focus:bg-red-50 focus:text-red-700 cursor-pointer font-medium">
+            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
+            <DropdownMenuItem onClick={() => signOut()} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950/40 focus:text-red-700 cursor-pointer font-medium">
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

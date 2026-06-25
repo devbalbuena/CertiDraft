@@ -75,18 +75,18 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        'hidden md:flex flex-col bg-white border-r border-slate-200 transition-all duration-300 ease-in-out relative z-40',
+        'hidden md:flex flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 ease-in-out relative z-40',
         isCollapsed ? 'w-[64px]' : 'w-[260px]'
       )}
     >
       {/* ── Logo Area ────────────────────────────────────────────────────── */}
-      <div className="h-16 flex items-center px-4 border-b border-slate-200">
+      <div className="h-16 flex items-center px-4 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
           <div className="h-7 w-7 bg-blue-600 rounded flex items-center justify-center shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-white"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
           </div>
           {!isCollapsed && (
-            <span className="text-lg font-bold tracking-tight text-slate-900 animate-in fade-in duration-200">
+            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white animate-in fade-in duration-200">
               CertiDraft
             </span>
           )}
@@ -122,8 +122,8 @@ export function Sidebar() {
               className={cn(
                 'group relative flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-blue-50/80 text-blue-700'
-                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-blue-50/80 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
               )}
             >
               {isActive && (
@@ -137,11 +137,11 @@ export function Sidebar() {
 
         {/* Section Label: Certificates */}
         {!isCollapsed ? (
-          <div className="mt-6 mb-2 px-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <div className="mt-6 mb-2 px-2.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
             Certificates
           </div>
         ) : (
-          <div className="mt-6 mb-2 mx-auto h-px w-6 bg-slate-200" />
+          <div className="mt-6 mb-2 mx-auto h-px w-6 bg-slate-200 dark:bg-slate-700" />
         )}
 
         <Link
@@ -150,8 +150,8 @@ export function Sidebar() {
           className={cn(
             'group relative flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium transition-all duration-200',
             pathname === '/dashboard/certificates'
-              ? 'bg-blue-50/80 text-blue-700'
-              : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+              ? 'bg-blue-50/80 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400'
+              : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
           )}
         >
           {pathname === '/dashboard/certificates' && (
@@ -163,7 +163,7 @@ export function Sidebar() {
       </div>
 
       {/* ── Secondary Navigation ─────────────────────────────────────────── */}
-      <div className="p-3 border-t border-slate-200 flex flex-col gap-1 bg-slate-50/50">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1 bg-slate-50/50 dark:bg-slate-900/50">
         {SECONDARY_NAV.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -174,8 +174,8 @@ export function Sidebar() {
               className={cn(
                 'group relative flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium transition-all duration-200',
                 isActive
-                  ? 'bg-blue-50/80 text-blue-700'
-                  : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'bg-blue-50/80 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
               )}
             >
               {isActive && (
@@ -201,9 +201,9 @@ export function Sidebar() {
         <button
           onClick={handleSignOut}
           title={isCollapsed ? 'Log out' : undefined}
-          className="group flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 w-full text-left"
+          className="group flex items-center gap-3 rounded-lg px-2.5 py-2.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 w-full text-left"
         >
-          <LogOut className="h-4 w-4 shrink-0 text-slate-400 group-hover:text-red-500 transition-colors" />
+          <LogOut className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500 group-hover:text-red-500 transition-colors" />
           {!isCollapsed && <span className="truncate">Log out</span>}
         </button>
       </div>
