@@ -18,10 +18,11 @@ CertiDraft is a comprehensive, full-stack certificate generation platform design
 - Secure password recovery flow
 - Profile management (Full Name, Avatar URL)
 
-**Project Management**
+**Project & Certificate Management**
 - Create and organize isolated certificate projects
 - Track generated certificate counts and project statuses
 - Global templates gallery for quick starts
+- Dedicated Certificates list view with search, pagination, and quick actions
 
 **Certificate Designer**
 - Advanced drag-and-drop canvas powered by Fabric.js
@@ -30,15 +31,17 @@ CertiDraft is a comprehensive, full-stack certificate generation platform design
 - Comprehensive properties panel (fonts, colors, alignment, corner radius, opacity)
 - Layer ordering (Bring to Front, Send to Back) and Canvas background color controls
 - Zoom, pan, undo, redo, and preview capabilities
+- Instant high-resolution client-side PDF export (via jsPDF)
 
 **Data Upload & Mapping**
 - 4-step interactive CSV upload wizard (using PapaParse)
 - Intelligent column mapping from CSV to certificate variables
 - Data preview table before initiating generation
 
-**AI Citation Generation**
-- Integration with Google's Gemini 2.0 Flash (`@google/generative-ai`)
-- Automatically generates personalized 2-3 sentence professional citations based on recipient name, achievement, and tone
+**AI Integration (Gemini 2.0 Flash)**
+- **Quick Generate Dashboard**: Describe your use case, and the AI will auto-select a template, draft the citation, and build the project instantly.
+- **Smart Templates**: Use a template with an AI prompt to instantly fit it to your event.
+- **Citation Assistant**: A sliding panel in the builder to automatically draft personalized, 2-3 sentence professional citations based on recipient name, achievement, and tone.
 
 **Batch Processing Worker**
 - Robust background worker using BullMQ and Redis
