@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -83,7 +85,9 @@ export default function SubscriptionPage() {
   const [usedThisMonth, setUsedThisMonth] = React.useState(0)
   const [expiresAt, setExpiresAt] = React.useState<string | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
-  const [upgradeDialogPlan, setUpgradeDialogPlan] = React.useState<string | null>(null)
+  const [upgradeDialogPlan, setUpgradeDialogPlan] = React.useState<PlanType | null>(null)
+  const [paymentMethod, setPaymentMethod] = React.useState('card')
+  const [isProcessing, setIsProcessing] = React.useState(false)
 
   React.useEffect(() => {
     async function loadPlan() {
@@ -106,19 +110,37 @@ export default function SubscriptionPage() {
     loadPlan()
   }, [])
 
-  const handleUpgrade = (planName: string) => {
-    setUpgradeDialogPlan(planName)
+  const handleUpgrade = (planId: PlanType) => {
+    setUpgradeDialogPlan(planId)
+    setPaymentMethod('card')
   }
 
-  const simulateUpgrade = async (planId: PlanType) => {
+  const handleMockPurchase = async () => {
+    if (!upgradeDialogPlan) return
+    setIsProcessing(true)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    const { error } = await supabase.from('users').update({ plan: planId }).eq('id', user.id)
+    if (!user) {
+      setIsProcessing(false)
+      return
+    }
+
+    // Set plan_expires_at to 30 days from now for paid plans
+    const expiryDate = new Date()
+    expiryDate.setDate(expiryDate.getDate() + 30)
+
+    const { error } = await supabase.from('users').update({ 
+      plan: upgradeDialogPlan,
+      plan_expires_at: upgradeDialogPlan === 'free' ? null : expiryDate.toISOString()
+    }).eq('id', user.id)
+    
+    setIsProcessing(false)
     if (error) {
-      toast.error('Failed to simulate upgrade')
+      toast.error('Failed to process upgrade', { description: error.message })
     } else {
-      toast.success(`Simulated upgrade to ${planId} plan for testing!`)
-      setCurrentPlan(planId)
+      toast.success(`Successfully upgraded to ${upgradeDialogPlan}!`)
+      setCurrentPlan(upgradeDialogPlan)
+      setExpiresAt(upgradeDialogPlan === 'free' ? null : expiryDate.toISOString())
+      setUpgradeDialogPlan(null)
     }
   }
 
@@ -231,48 +253,47 @@ export default function SubscriptionPage() {
                   variant={isActive ? 'outline' : plan.popular ? 'default' : 'secondary'} 
                   className="w-full"
                   disabled={isActive}
-                  onClick={() => !isActive && handleUpgrade(plan.name)}
+                  onClick={() => !isActive && handleUpgrade(plan.id)}
                 >
                   {isActive ? 'Active' : 'Upgrade'}
                 </Button>
-                {process.env.NODE_ENV === 'development' && !isActive && (
-                  <Button 
-                    variant="outline" 
-                    className="w-full border-dashed text-xs h-8 text-muted-foreground"
-                    onClick={() => simulateUpgrade(plan.id)}
-                  >
-                    Simulate {plan.name} (Dev)
-                  </Button>
-                )}
               </CardFooter>
             </Card>
           )
         })}
       </div>
 
-      <Dialog open={!!upgradeDialogPlan} onOpenChange={(open) => !open && setUpgradeDialogPlan(null)}>
-        <DialogContent>
+      <Dialog open={!!upgradeDialogPlan} onOpenChange={(open) => !open && !isProcessing && setUpgradeDialogPlan(null)}>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Upgrade to {upgradeDialogPlan}</DialogTitle>
+            <DialogTitle className="capitalize">Upgrade to {upgradeDialogPlan}</DialogTitle>
             <DialogDescription>
-              We are currently onboarding enterprise customers manually while we integrate our automated payment systems.
+              Select a payment method to complete your purchase for testing purposes.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              To upgrade your account to the <strong>{upgradeDialogPlan}</strong> plan immediately, please contact your platform administrator or our sales team.
-            </p>
-            <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-800 text-sm font-medium text-slate-800 dark:text-slate-200">
-              sales@certidraft.com
-            </div>
+          <div className="py-6">
+            <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-4">
+              <div className="flex items-center space-x-3 border p-4 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors" onClick={() => setPaymentMethod('card')}>
+                <RadioGroupItem value="card" id="card" />
+                <Label htmlFor="card" className="flex-1 cursor-pointer font-medium">Credit / Debit Card</Label>
+              </div>
+              <div className="flex items-center space-x-3 border p-4 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors" onClick={() => setPaymentMethod('gcash')}>
+                <RadioGroupItem value="gcash" id="gcash" />
+                <Label htmlFor="gcash" className="flex-1 cursor-pointer font-medium">GCash</Label>
+              </div>
+              <div className="flex items-center space-x-3 border p-4 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors" onClick={() => setPaymentMethod('paypal')}>
+                <RadioGroupItem value="paypal" id="paypal" />
+                <Label htmlFor="paypal" className="flex-1 cursor-pointer font-medium">PayPal</Label>
+              </div>
+            </RadioGroup>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setUpgradeDialogPlan(null)}>Close</Button>
-            <Button onClick={() => {
-              window.location.href = 'mailto:sales@certidraft.com'
-              setUpgradeDialogPlan(null)
-            }}>
-              Contact Sales
+          <DialogFooter className="sm:justify-between gap-3">
+            <Button variant="outline" onClick={() => setUpgradeDialogPlan(null)} disabled={isProcessing}>
+              Cancel
+            </Button>
+            <Button onClick={handleMockPurchase} disabled={isProcessing} className="w-full sm:w-auto">
+              {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isProcessing ? 'Processing...' : 'Confirm Purchase'}
             </Button>
           </DialogFooter>
         </DialogContent>
