@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './Sidebar'
 import { AdminSidebar } from './AdminSidebar'
+import { NotificationBell } from './NotificationBell'
 import { useTheme } from '@/context/ThemeContext'
 
 export function Topbar() {
@@ -101,10 +102,7 @@ export function Topbar() {
           <span className="sr-only">Toggle theme</span>
         </Button>
 
-        <Button variant="ghost" size="icon" className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
-          <Bell className="h-[18px] w-[18px]" />
-          <span className="sr-only">Notifications</span>
-        </Button>
+        <NotificationBell />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -131,10 +129,6 @@ export function Topbar() {
             <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
             <DropdownMenuItem className="text-slate-700 dark:text-slate-300 focus:bg-slate-50 dark:focus:bg-slate-800 focus:text-slate-900 dark:focus:text-slate-100 cursor-pointer" asChild>
               <a href="/dashboard/settings">Settings</a>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800" />
-            <DropdownMenuItem onClick={() => signOut()} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-950/40 focus:text-red-700 cursor-pointer font-medium">
-              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
