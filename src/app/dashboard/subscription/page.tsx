@@ -32,7 +32,9 @@ const PLANS = [
       '5 certificates per month',
       'Basic templates',
       'CertiDraft watermark on PDFs',
-    ]
+    ],
+    colorClass: 'border-slate-200 dark:border-slate-800 hover:border-slate-300',
+    iconClass: 'text-slate-500',
   },
   {
     id: 'starter' as PlanType,
@@ -46,7 +48,9 @@ const PLANS = [
       'No watermarks',
       'CSV bulk upload',
       'Email delivery via SendGrid',
-    ]
+    ],
+    colorClass: 'border-blue-200 dark:border-blue-900/50 hover:border-blue-300 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/20',
+    iconClass: 'text-blue-500',
   },
   {
     id: 'pro' as PlanType,
@@ -62,6 +66,8 @@ const PLANS = [
       'Priority processing',
     ],
     popular: true,
+    colorClass: 'border-violet-200 dark:border-violet-900/50 hover:border-violet-300 shadow-md bg-gradient-to-b from-violet-50/50 to-transparent dark:from-violet-950/20',
+    iconClass: 'text-violet-500',
   },
   {
     id: 'enterprise' as PlanType,
@@ -75,9 +81,13 @@ const PLANS = [
       'Everything in Pro',
       'API Access (Coming soon)',
       'Custom branding',
-    ]
+    ],
+    colorClass: 'border-amber-200 dark:border-amber-900/50 hover:border-amber-300 bg-gradient-to-b from-amber-50/50 to-transparent dark:from-amber-950/20',
+    iconClass: 'text-amber-500',
   }
 ]
+
+const PLAN_ORDER = ['free', 'starter', 'pro', 'enterprise']
 
 export default function SubscriptionPage() {
   const supabase = createClient()
@@ -202,15 +212,19 @@ export default function SubscriptionPage() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4 pt-4">
         {PLANS.map((plan) => {
           const isActive = currentPlan === plan.id
+          const currentIndex = PLAN_ORDER.indexOf(currentPlan)
+          const thisIndex = PLAN_ORDER.indexOf(plan.id)
+          const isDowngrade = thisIndex < currentIndex
+          
           const Icon = plan.icon
           
           return (
             <Card 
               key={plan.id} 
-              className={`flex flex-col relative ${isActive ? 'border-primary shadow-md' : ''} ${plan.popular ? 'border-blue-500 shadow-sm' : ''}`}
+              className={`flex flex-col relative transition-all ${plan.colorClass} ${isActive ? 'ring-2 ring-primary border-primary shadow-lg dark:ring-primary dark:border-primary' : ''}`}
             >
               {isActive && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -227,7 +241,7 @@ export default function SubscriptionPage() {
               
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2 text-muted-foreground">
-                  <Icon className="h-5 w-5" />
+                  <Icon className={`h-5 w-5 ${plan.iconClass}`} />
                   <span className="font-medium">{plan.name}</span>
                 </div>
                 <div className="flex items-baseline text-3xl font-bold">
@@ -252,10 +266,10 @@ export default function SubscriptionPage() {
                 <Button 
                   variant={isActive ? 'outline' : plan.popular ? 'default' : 'secondary'} 
                   className="w-full"
-                  disabled={isActive}
-                  onClick={() => !isActive && handleUpgrade(plan.id)}
+                  disabled={isActive || isDowngrade}
+                  onClick={() => !isActive && !isDowngrade && handleUpgrade(plan.id)}
                 >
-                  {isActive ? 'Active' : 'Upgrade'}
+                  {isActive ? 'Active' : isDowngrade ? 'Included in current plan' : 'Upgrade'}
                 </Button>
               </CardFooter>
             </Card>
