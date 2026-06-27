@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
-import { ProjectStepper } from '@/components/projects/ProjectStepper'
+import { ProjectManager } from '@/components/projects/ProjectManager'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -64,7 +64,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     .order('created_at', { ascending: false })
     .limit(1)
 
+  // Count total projects to determine if this is a new user
+  const { count: projectCount } = await supabase
+    .from('projects')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+
   const latestBatchJob = batchJobs?.[0] ?? null
+  const isNewUser = (projectCount ?? 0) <= 1
 
   const templateOptions = (featuredTemplates ?? []).map((t) => ({
     id: t.id,
@@ -88,9 +95,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       {/* Page header — no status badge here, status lives in the stepper progress */}
       <PageHeader title={project.name} subtitle="" />
 
-      {/* Guided stepper */}
+      {/* Guided stepper or Expert dashboard — managed by ProjectManager */}
       <div className="mt-8">
-        <ProjectStepper
+        <ProjectManager
           project={{
             id: project.id,
             name: project.name,
@@ -105,6 +112,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           }}
           featuredTemplates={templateOptions}
           latestBatchJob={latestBatchJob}
+          isNewUser={isNewUser}
         />
       </div>
     </div>

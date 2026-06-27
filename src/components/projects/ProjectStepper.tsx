@@ -63,6 +63,8 @@ interface ProjectStepperProps {
     total_count: number
     created_at: string
   } | null
+  /** Called when the user clicks "Skip tutorial" — switches to expert view */
+  onSkip?: () => void
 }
 
 // ─── Step definitions ─────────────────────────────────────────────────────────
@@ -604,6 +606,7 @@ export function ProjectStepper({
   project,
   featuredTemplates,
   latestBatchJob,
+  onSkip,
 }: ProjectStepperProps) {
   const statuses = getStepStatuses(project, latestBatchJob)
   const defaultActive = getActiveStep(statuses)
@@ -626,9 +629,19 @@ export function ProjectStepper({
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
           <span className="text-slate-500 dark:text-slate-400">{subtitle}</span>
-          <span className="text-slate-400 dark:text-slate-600 font-medium">
-            {completedCount} / 4 steps done
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-slate-400 dark:text-slate-600 font-medium">
+              {completedCount} / 4 steps done
+            </span>
+            {onSkip && (
+              <button
+                onClick={onSkip}
+                className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-600 dark:hover:text-slate-400 underline underline-offset-2 transition-colors"
+              >
+                Skip tutorial
+              </button>
+            )}
+          </div>
         </div>
         <Progress value={progressPercent} className="h-2" />
       </div>
