@@ -214,36 +214,37 @@ export default function LoginPage() {
       {/* ── 3. Showcase Area (Hidden on Mobile) ─────────────────────────────── */}
       <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#9dcbf8] to-[#bde0fe] relative z-10 items-center justify-between pl-0 pr-16 py-12">
         
-        {/* Certificate Frame Mockup (Cut off on the left edge intentionally) */}
-        <div className="h-[75%] aspect-[0.75] bg-[#1d1d1b] shadow-2xl relative -ml-16 rounded flex items-center justify-center p-4 lg:p-6 transform rotate-1 border-r border-y border-[#3d3d3a]">
-          {/* Inner Certificate */}
-          <div className="w-full h-full bg-[#f8f9fa] relative border-2 border-[#b0b9c6] p-4 flex flex-col items-center justify-center">
-            {/* Double Border Detail */}
-            <div className="absolute inset-2 border border-[#8f9eb5]"></div>
-            
-            <div className="flex flex-col items-center justify-center w-full z-10 space-y-6">
-              {/* Fake Logo */}
-              <div className="w-16 h-16 rounded-full bg-[#0a1526]/10 text-[#0a1526] flex items-center justify-center">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
-              </div>
-              <h2 className="font-serif text-3xl font-bold text-[#0a1526]">Certificate</h2>
-              
-              <div className="w-1/2 h-px bg-slate-300"></div>
-              
-              <div className="space-y-2 w-3/4">
-                <div className="h-1.5 bg-slate-200 rounded-full w-full"></div>
-                <div className="h-1.5 bg-slate-200 rounded-full w-5/6 mx-auto"></div>
-                <div className="h-1.5 bg-slate-200 rounded-full w-4/6 mx-auto"></div>
-              </div>
-              
-              <div className="w-16 h-16 rounded-full bg-amber-400 shadow-md border-4 border-amber-200 flex items-center justify-center mt-4">
-                 <Award className="w-8 h-8 text-amber-700" />
-              </div>
-              
-              <div className="w-full flex justify-between items-end px-8 mt-8">
-                 <div className="w-16 h-0.5 bg-slate-400"></div>
-                 <div className="w-16 h-0.5 bg-slate-400"></div>
-              </div>
+        {/* Floating Certificates Showcase */}
+        <div className="relative w-1/2 h-full flex items-center justify-center -ml-8 perspective-[1200px]">
+          
+          {/* Back Card - Dark */}
+          <div className="absolute w-[280px] aspect-[1.4] bg-slate-900 rounded-2xl shadow-2xl border border-slate-700 transform rotate-y-[-20deg] rotate-z-[-6deg] translate-x-[-60px] translate-y-[-40px] opacity-70 flex flex-col items-center justify-center p-6">
+            <div className="w-10 h-10 rounded-full bg-slate-800 mb-2 border border-slate-700"></div>
+            <div className="w-32 h-2 bg-slate-800 rounded-full mb-2"></div>
+            <div className="w-24 h-1.5 bg-slate-800 rounded-full mb-1"></div>
+            <div className="w-20 h-1 bg-slate-800 rounded-full"></div>
+            <div className="w-8 h-8 text-slate-700 mt-5"><Award className="w-full h-full" /></div>
+          </div>
+
+          {/* Middle Card - Modern Gradient */}
+          <div className="absolute w-[300px] aspect-[1.4] bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-[0_20px_40px_-15px_rgba(79,70,229,0.5)] border border-white/20 transform rotate-y-[-15deg] rotate-z-[4deg] translate-x-[40px] translate-y-[-10px] flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-[6px] border border-white/20 rounded-xl"></div>
+            <div className="text-[9px] font-bold text-indigo-200 uppercase tracking-widest mb-1">Recognition</div>
+            <div className="text-xl font-extrabold text-white text-center leading-tight">Innovation Award</div>
+            <div className="w-8 h-8 text-amber-300 mt-4"><Award className="w-full h-full" /></div>
+          </div>
+
+          {/* Front Card - Classic Minimal */}
+          <div className="absolute w-[340px] aspect-[1.4] bg-white rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)] border border-slate-200 transform rotate-y-[-10deg] rotate-z-[-2deg] translate-x-[-10px] translate-y-[30px] flex flex-col items-center justify-center p-6 hover:translate-y-[25px] hover:rotate-y-0 hover:rotate-z-0 hover:scale-105 transition-all duration-500 cursor-default">
+            <div className="absolute inset-[8px] border-[1.5px] border-slate-100 rounded-xl"></div>
+            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mb-3 shadow-sm border border-blue-100">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+            </div>
+            <div className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Certificate of</div>
+            <div className="text-2xl font-extrabold text-slate-800">Completion</div>
+            <div className="w-16 h-px bg-slate-200 my-4"></div>
+            <div className="w-10 h-10 rounded-full bg-amber-400 shadow-md border-4 border-amber-200 flex items-center justify-center">
+              <Award className="w-5 h-5 text-amber-700" />
             </div>
           </div>
         </div>
