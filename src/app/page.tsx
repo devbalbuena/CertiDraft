@@ -89,7 +89,7 @@ export default function LandingPage() {
         
         {/* ── 1. Animated Hero Section ────────────────────────────────────── */}
         <section className="relative pt-24 pb-32 px-6 overflow-hidden bg-white border-b border-slate-200">
-          {/* Subtle animated background gradients */}
+          {/* Subtle animated background gradients & floating certificates */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] opacity-30 pointer-events-none">
             <motion.div 
               animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
@@ -100,6 +100,17 @@ export default function LandingPage() {
               animate={{ x: [0, -50, 0], y: [0, -30, 0] }}
               transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
               className="absolute top-40 right-20 w-96 h-96 bg-cyan-300 rounded-full mix-blend-multiply filter blur-[100px]" 
+            />
+            {/* Floating blurred certificates for context */}
+            <motion.div 
+              animate={{ y: [0, -20, 0], rotate: [-5, -2, -5] }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-10 right-10 w-48 h-32 bg-white/50 border border-slate-200/50 rounded-xl shadow-xl filter blur-[2px]" 
+            />
+            <motion.div 
+              animate={{ y: [0, 20, 0], rotate: [5, 8, 5] }}
+              transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute top-32 left-10 w-56 h-40 bg-white/40 border border-slate-200/50 rounded-xl shadow-xl filter blur-[3px]" 
             />
           </div>
 
@@ -133,43 +144,43 @@ export default function LandingPage() {
               Prompt text and our AI generates editable, professional certificates instantly. Create awards, recognition, or course completion certificates in seconds.
             </motion.p>
 
-            {/* AI Prompt Box */}
+            {/* AI Prompt Box Wrapper with Glow */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3, type: "spring", stiffness: 100 }}
-              className="w-full max-w-3xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-200 overflow-hidden"
+              className="w-full max-w-3xl relative group"
             >
-              <form onSubmit={handleGenerate}>
-                {/* Fake Toolbar */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                  <div className="flex items-center gap-4">
-                    <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors">
-                      <Sparkles className="w-4 h-4" />
-                    </button>
-                    <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors">
-                      <Settings className="w-4 h-4" />
-                    </button>
-                    <button type="button" className="text-slate-400 hover:text-slate-600 transition-colors">
-                      <RefreshCw className="w-4 h-4" />
-                    </button>
-                    <div className="h-4 w-px bg-slate-200"></div>
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">Upgrade</span>
-                    <span className="text-xs font-medium text-slate-500 hidden sm:inline">for best quality and full control.</span>
-                  </div>
-                </div>
-                
-                {/* Text Area */}
-                <div className="p-4 relative">
-                  <textarea
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Describe the award or certificate details..."
-                    className="w-full h-24 resize-none outline-none text-slate-700 text-lg placeholder:text-slate-300 font-medium bg-transparent"
-                    autoFocus
-                  />
-                  
-                  {/* Bottom Controls */}
+              {/* Animated Glow */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-3xl blur-md opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              
+              <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-white/50">
+                <form onSubmit={handleGenerate}>
+                  {/* Text Area */}
+                  <div className="p-4 pt-6 relative">
+                    <textarea
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      placeholder="Describe the award or certificate details..."
+                      className="w-full h-24 resize-none outline-none text-slate-700 text-lg placeholder:text-slate-300 font-medium bg-transparent"
+                      autoFocus
+                    />
+                    
+                    {/* Prompt Suggestions */}
+                    <div className="flex flex-wrap gap-2 mt-2 mb-4">
+                      {['✨ Modern Hackathon Winner', '🏆 Employee of the Month', '🎓 Course Completion'].map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => setPrompt(suggestion)}
+                          className="text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full transition-colors border border-indigo-100 shadow-sm"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Bottom Controls */}
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center gap-3">
                       <button type="button" className="flex items-center gap-1.5 text-sm font-bold text-slate-600 hover:text-indigo-600 transition-colors">
@@ -201,6 +212,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </form>
+              </div>
             </motion.div>
 
             {/* Certificate Template Previews Grid */}
