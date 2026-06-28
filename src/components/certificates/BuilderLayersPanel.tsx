@@ -167,10 +167,10 @@ export function BuilderLayersPanel() {
   ]
 
   return (
-    <div className="w-[220px] border-r border-slate-800 bg-[#1e293b] flex flex-col shrink-0 overflow-hidden">
+    <div className="w-[220px] border-r border-slate-200 bg-white flex flex-col shrink-0 overflow-hidden">
 
       {/* Tab Bar */}
-      <div className="flex border-b border-slate-800 shrink-0">
+      <div className="flex border-b border-slate-100 shrink-0">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -179,8 +179,8 @@ export function BuilderLayersPanel() {
             className={cn(
               'flex-1 flex flex-col items-center gap-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors',
               activeTab === tab.id
-                ? 'text-indigo-400 border-b-2 border-indigo-500 bg-slate-900/40'
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50'
+                : 'text-slate-400 hover:text-slate-700'
             )}
           >
             {tab.icon}
@@ -192,14 +192,14 @@ export function BuilderLayersPanel() {
       {/* Layers Tab */}
       {activeTab === 'layers' && (
         <div className="flex-1 overflow-y-auto">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800/60">
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Layers</span>
-            <span className="ml-auto text-[10px] text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded font-mono">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-100">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Layers</span>
+            <span className="ml-auto text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded font-mono">
               {objects.length}
             </span>
           </div>
           {objects.length === 0 ? (
-            <p className="text-xs text-slate-600 text-center py-10 px-4 leading-relaxed">
+            <p className="text-xs text-slate-400 text-center py-10 px-4 leading-relaxed">
               No elements yet. Add shapes or text from the Elements tab.
             </p>
           ) : (
@@ -213,11 +213,11 @@ export function BuilderLayersPanel() {
                     className={cn(
                       'group flex items-center gap-2 px-3 py-2 cursor-pointer text-xs transition-all',
                       isActive
-                        ? 'bg-indigo-600/20 text-indigo-300 border-l-2 border-indigo-500'
-                        : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 border-l-2 border-transparent'
+                        ? 'bg-indigo-50 text-indigo-700 border-l-2 border-indigo-500'
+                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border-l-2 border-transparent'
                     )}
                   >
-                    <span className={cn('shrink-0', isActive ? 'text-indigo-400' : 'text-slate-600')}>
+                    <span className={cn('shrink-0', isActive ? 'text-indigo-600' : 'text-slate-400')}>
                       {getObjectIcon(obj.type)}
                     </span>
                     <span className="flex-1 truncate font-medium">
@@ -257,7 +257,7 @@ export function BuilderLayersPanel() {
                 <button
                   key={label}
                   onClick={action}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-800/60 hover:bg-slate-700/80 border border-slate-700/50 hover:border-indigo-500/40 text-slate-400 hover:text-slate-200 transition-all group"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-indigo-300 text-slate-500 hover:text-slate-900 transition-all group"
                 >
                   <span className="group-hover:text-indigo-400 transition-colors">{icon}</span>
                   <span className="text-[10px] font-medium">{label}</span>
@@ -278,7 +278,7 @@ export function BuilderLayersPanel() {
                 canvas.add(t); canvas.setActiveObject(t); canvas.requestRenderAll()
                 pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
               }}
-              className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-700/80 border border-slate-700/50 hover:border-indigo-500/40 text-slate-400 hover:text-slate-200 transition-all"
+              className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-indigo-300 text-slate-500 hover:text-slate-900 transition-all"
             >
               <Type className="h-4 w-4" />
               <span className="text-xs font-medium">Add Text Block</span>

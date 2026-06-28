@@ -31,8 +31,8 @@ import { cn } from '@/lib/utils'
 function SectionHeader({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 mb-3">
-      <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{children}</h4>
-      <div className="flex-1 h-px bg-slate-800" />
+      <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{children}</h4>
+      <div className="flex-1 h-px bg-slate-100" />
     </div>
   )
 }
@@ -121,11 +121,11 @@ export function BuilderPropertiesPanel() {
   // -- Empty state (Canvas properties) ------------------------------------
   if (!selectedElement) {
     return (
-      <div className="w-[260px] border-l border-slate-800 bg-[#1e293b] flex flex-col shrink-0 overflow-y-auto">
-        <div className="px-4 py-3 border-b border-slate-800">
+      <div className="w-[260px] border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-y-auto">
+        <div className="px-4 py-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <Paintbrush className="h-3.5 w-3.5 text-slate-500" />
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Properties</h3>
+            <Paintbrush className="h-3.5 w-3.5 text-slate-400" />
+            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider">Properties</h3>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ export function BuilderPropertiesPanel() {
             <Label className="text-[11px] text-slate-500">Background Color</Label>
             <div className="flex items-center gap-2">
               <div
-                className="w-8 h-8 rounded-lg border border-slate-700 cursor-pointer shadow-inner overflow-hidden flex-shrink-0"
+                className="w-8 h-8 rounded-lg border border-slate-200 cursor-pointer shadow-inner overflow-hidden flex-shrink-0"
                 style={{ backgroundColor: canvas?.backgroundColor?.toString() || '#ffffff' }}
               >
                 <input
@@ -153,7 +153,7 @@ export function BuilderPropertiesPanel() {
                   className="opacity-0 w-full h-full cursor-pointer"
                 />
               </div>
-              <span className="text-xs font-mono text-slate-400">
+              <span className="text-xs font-mono text-slate-500">
                 {canvas?.backgroundColor?.toString() || '#ffffff'}
               </span>
             </div>
@@ -161,7 +161,7 @@ export function BuilderPropertiesPanel() {
         </div>
 
         <div className="flex-1" />
-        <p className="text-[11px] text-slate-600 text-center pb-6 px-4 leading-relaxed">
+        <p className="text-[11px] text-slate-400 text-center pb-6 px-4 leading-relaxed">
           Select an element on the canvas to edit its properties.
         </p>
       </div>
@@ -174,15 +174,15 @@ export function BuilderPropertiesPanel() {
   const isShape = type === 'rect' || type === 'circle' || type === 'ellipse' || type === 'triangle'
 
   return (
-    <div className="w-[260px] border-l border-slate-800 bg-[#1e293b] flex flex-col shrink-0 overflow-y-auto">
+    <div className="w-[260px] border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-y-auto">
 
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+      <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Paintbrush className="h-3.5 w-3.5 text-slate-500" />
-          <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">Properties</h3>
+          <Paintbrush className="h-3.5 w-3.5 text-slate-400" />
+          <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider">Properties</h3>
         </div>
-        <span className="text-[10px] font-mono text-slate-500 bg-slate-800 px-2 py-0.5 rounded">
+        <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
           {displayType}
         </span>
       </div>
@@ -199,7 +199,7 @@ export function BuilderPropertiesPanel() {
               <Textarea
                 value={(selectedElement as any).text || ''}
                 onChange={(e) => updateProp('text', e.target.value)}
-                className="text-xs min-h-[60px] bg-slate-900/60 border-slate-700 text-slate-200 placeholder:text-slate-600 resize-none focus:border-indigo-500 focus:ring-indigo-500/20"
+                className="text-xs min-h-[60px] bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-300 resize-none focus:border-indigo-500"
               />
             </div>
 
@@ -231,18 +231,18 @@ export function BuilderPropertiesPanel() {
                 value={(selectedElement as any).fontFamily || 'Inter'}
                 onValueChange={(v) => updateProp('fontFamily', v)}
               >
-                <SelectTrigger className="bg-slate-900/60 border-slate-700 text-slate-200 text-xs h-8 focus:ring-indigo-500/20">
+                <SelectTrigger className="bg-slate-50 border-slate-200 text-slate-800 text-xs h-8">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1e293b] border-slate-700 text-slate-300">
+                <SelectContent className="bg-white border-slate-200 text-slate-700">
                   {DEFAULT_FONTS.map(f => (
-                    <SelectItem key={f} value={f} className="text-xs hover:bg-slate-800">{f}</SelectItem>
+                    <SelectItem key={f} value={f} className="text-xs hover:bg-slate-50">{f}</SelectItem>
                   ))}
                   {customFonts.length > 0 && (
                     <>
-                      <div className="px-2 py-1.5 text-[9px] font-bold text-slate-500 uppercase tracking-widest border-t border-slate-700 mt-1 pt-2">Custom Fonts</div>
+                      <div className="px-2 py-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-100 mt-1 pt-2">Custom Fonts</div>
                       {customFonts.map(f => (
-                        <SelectItem key={f} value={f} className="text-xs hover:bg-slate-800">
+                        <SelectItem key={f} value={f} className="text-xs hover:bg-slate-50">
                           {f} <span className="ml-1 text-[9px] text-indigo-400">↑</span>
                         </SelectItem>
                       ))}
@@ -255,16 +255,16 @@ export function BuilderPropertiesPanel() {
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
                 <Label className="text-[11px] text-slate-500">Size</Label>
-                <Input
-                  type="number"
-                  value={(selectedElement as any).fontSize || 16}
-                  onChange={(e) => updateProp('fontSize', Number(e.target.value))}
-                  className="h-8 text-xs bg-slate-900/60 border-slate-700 text-slate-200 focus:border-indigo-500"
-                />
+                  <Input
+                    type="number"
+                    value={(selectedElement as any).fontSize || 16}
+                    onChange={(e) => updateProp('fontSize', Number(e.target.value))}
+                    className="h-8 text-xs bg-slate-50 border-slate-200 text-slate-800 focus:border-indigo-500"
+                  />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-[11px] text-slate-500">Color</Label>
-                <div className="h-8 w-full rounded-md border border-slate-700 overflow-hidden">
+                <div className="h-8 w-full rounded-md border border-slate-200 overflow-hidden">
                   <input
                     type="color"
                     value={(selectedElement as any).fill || '#000000'}
@@ -290,7 +290,7 @@ export function BuilderPropertiesPanel() {
                       'flex-1 py-1.5 rounded-md border text-xs transition-all',
                       active
                         ? 'bg-indigo-600 border-indigo-500 text-white'
-                        : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
                     )}
                   >
                     <span className="flex justify-center">{icon}</span>
@@ -314,7 +314,7 @@ export function BuilderPropertiesPanel() {
                       'flex-1 py-1.5 rounded-md border text-xs transition-all',
                       (selectedElement as any).textAlign === value
                         ? 'bg-indigo-600 border-indigo-500 text-white'
-                        : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                        : 'bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300'
                     )}
                   >
                     <span className="flex justify-center">{icon}</span>
@@ -406,7 +406,7 @@ export function BuilderPropertiesPanel() {
                 canvas.requestRenderAll()
                 pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
               }}
-              className="py-1.5 rounded-md bg-slate-900/60 border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600 text-xs font-medium transition-all"
+              className="py-1.5 rounded-md bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 text-xs font-medium transition-all"
             >
               Send to Back
             </button>
@@ -418,7 +418,7 @@ export function BuilderPropertiesPanel() {
                 canvas.requestRenderAll()
                 pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
               }}
-              className="py-1.5 rounded-md bg-slate-900/60 border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-600 text-xs font-medium transition-all"
+              className="py-1.5 rounded-md bg-slate-50 border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300 text-xs font-medium transition-all"
             >
               Bring to Front
             </button>

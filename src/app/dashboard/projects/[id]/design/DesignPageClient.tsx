@@ -17,10 +17,10 @@ const CertificateBuilder = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex-1 flex items-center justify-center bg-[#0f172a]" style={{ height: 'calc(100vh - 48px)' }}>
-        <div className="flex flex-col items-center gap-3 text-slate-500">
-          <div className="h-8 w-8 rounded-full border-2 border-slate-700 border-t-indigo-500 animate-spin" />
-          <span className="text-sm font-medium">Initialising certificate builder…</span>
+      <div className="flex-1 flex items-center justify-center bg-slate-100" style={{ height: 'calc(100vh - 48px)' }}>
+        <div className="flex flex-col items-center gap-3 text-slate-400">
+          <div className="h-8 w-8 rounded-full border-2 border-slate-200 border-t-indigo-500 animate-spin" />
+          <span className="text-sm font-medium text-slate-500">Initialising certificate builder…</span>
         </div>
       </div>
     ),
@@ -57,24 +57,24 @@ export function DesignPageClient({ projectId, projectName, initialData }: Design
   }, [projectId])
 
   return (
-    <div className="flex flex-col h-screen bg-[#0f172a]">
-      {/* ── Slim Dark Header ──────────────────────────────────────────────── */}
-      <header className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-slate-800 bg-[#1e293b] z-20">
+    <div className="flex flex-col h-screen bg-slate-100">
+      {/* ── Slim Light Header ──────────────────────────────────────────────── */}
+      <header className="h-12 shrink-0 flex items-center gap-3 px-4 border-b border-slate-200 bg-white z-20 shadow-sm">
         {/* Back link */}
         <Link
           href={`/dashboard/projects/${projectId}`}
-          className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-xs font-medium"
+          className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 transition-colors text-xs font-medium"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Dashboard
         </Link>
 
         {/* Breadcrumb */}
-        <span className="text-slate-700 text-xs">/</span>
-        <span className="text-slate-400 text-xs">Design</span>
-        <span className="text-slate-700 text-xs">/</span>
-        <span className="text-slate-200 text-xs font-semibold truncate max-w-[180px]">{projectName}</span>
-        <span className="text-slate-600 text-xs hidden sm:inline">— Certificate Builder</span>
+        <span className="text-slate-300 text-xs">/</span>
+        <span className="text-slate-500 text-xs">Design</span>
+        <span className="text-slate-300 text-xs">/</span>
+        <span className="text-slate-800 text-xs font-semibold truncate max-w-[180px]">{projectName}</span>
+        <span className="text-slate-400 text-xs hidden sm:inline">— Certificate Builder</span>
 
         <div className="flex-1" />
 

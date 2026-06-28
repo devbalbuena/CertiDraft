@@ -243,10 +243,10 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
   ]
 
   return (
-    <div className="relative flex items-center gap-1 border-b border-slate-800 bg-[#1e293b] px-3 h-12 shrink-0 overflow-visible">
+    <div className="relative flex items-center gap-1 border-b border-slate-200 bg-white px-3 h-12 shrink-0 overflow-visible shadow-sm">
 
       {/* Tool Selector */}
-      <div className="flex items-center gap-0.5 bg-slate-900/60 rounded-lg p-0.5">
+      <div className="flex items-center gap-0.5 bg-slate-100 rounded-lg p-0.5">
         {toolButtons.map(({ id, icon, label, action }) => (
           <button
             key={id}
@@ -256,7 +256,7 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
               'p-2 rounded-md transition-all text-sm',
               activeTool === id
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
             )}
           >
             {icon}
@@ -264,14 +264,14 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
         ))}
       </div>
 
-      <div className="w-px h-6 bg-slate-700 mx-1" />
+      <div className="w-px h-6 bg-slate-200 mx-1" />
 
       {/* Media buttons */}
       <div className="flex items-center gap-1">
         <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleImageUpload} />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 text-xs font-medium transition-all"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-medium transition-all"
           title="Add Image"
         >
           <ImageIcon className="h-3.5 w-3.5" />
@@ -279,7 +279,7 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
         </button>
         <button
           onClick={addQRCode}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 text-xs font-medium transition-all"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-medium transition-all"
           title="Add QR Code"
         >
           <QrCode className="h-3.5 w-3.5" />
@@ -287,22 +287,22 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
         </button>
       </div>
 
-      <div className="w-px h-6 bg-slate-700 mx-1" />
+      <div className="w-px h-6 bg-slate-200 mx-1" />
 
       {/* Dynamic Variables */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/50 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all">
+          <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all">
             <span>Variables</span>
             <ChevronDown className="h-3 w-3 ml-0.5" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="bg-[#1e293b] border-slate-700 text-slate-300 z-50">
+        <DropdownMenuContent className="bg-white border-slate-200 text-slate-700 z-50">
           {VARIABLES.map((v) => (
             <DropdownMenuItem
               key={v}
               onClick={() => addText(v)}
-              className="font-mono text-xs hover:bg-slate-800 hover:text-indigo-300 cursor-pointer"
+              className="font-mono text-xs hover:bg-slate-50 hover:text-indigo-600 cursor-pointer"
             >
               {v}
             </DropdownMenuItem>
@@ -324,14 +324,14 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
         <span>AI Assist</span>
       </button>
 
-      <div className="w-px h-6 bg-slate-700 mx-1" />
+      <div className="w-px h-6 bg-slate-200 mx-1" />
 
       {/* History */}
       <div className="flex items-center gap-0.5">
         <button
           onClick={undo}
           disabled={!canUndo}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           title="Undo"
         >
           <Undo2 className="h-4 w-4" />
@@ -339,37 +339,37 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
         <button
           onClick={redo}
           disabled={!canRedo}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           title="Redo"
         >
           <Redo2 className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="w-px h-6 bg-slate-700 mx-1" />
+      <div className="w-px h-6 bg-slate-200 mx-1" />
 
       {/* Zoom */}
       <div className="flex items-center gap-0.5">
         <button
           onClick={() => setZoom(Math.max(0.25, zoom - 0.1))}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all"
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
           title="Zoom Out"
         >
           <ZoomOut className="h-4 w-4" />
         </button>
-        <span className="text-xs font-mono text-slate-400 w-10 text-center">
+        <span className="text-xs font-mono text-slate-500 w-10 text-center">
           {Math.round(zoom * 100)}%
         </span>
         <button
           onClick={() => setZoom(Math.min(3, zoom + 0.1))}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all"
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
           title="Zoom In"
         >
           <ZoomIn className="h-4 w-4" />
         </button>
         <button
           onClick={() => setZoom(1)}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all"
+          className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-all"
           title="Reset Zoom"
         >
           <Maximize className="h-4 w-4" />
@@ -382,14 +382,14 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
       <div className="flex items-center gap-2">
         <button
           onClick={handlePreview}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white text-xs font-semibold transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-900 text-xs font-semibold transition-all"
         >
           <Eye className="h-3.5 w-3.5" />
           Preview
         </button>
         <button
           onClick={handleDownloadPDF}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all border border-slate-200"
           title="Download as PDF"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
