@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { PlanChartClient } from './PlanChartClient'
 import { StatCard } from '@/components/layout/StatCard'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
@@ -42,9 +43,14 @@ const PLAN_COLORS: Record<string, string> = {
 
 function StatusDot({ healthy }: { healthy: boolean }) {
   return healthy ? (
-    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+    <span className="relative flex h-3 w-3 mr-1">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+    </span>
   ) : (
-    <XCircle className="w-5 h-5 text-red-500" />
+    <span className="relative flex h-3 w-3 mr-1">
+      <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+    </span>
   )
 }
 
@@ -99,6 +105,12 @@ export default async function AdminOverviewPage() {
   }, 0)
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  
+  const recentSignupsUsers = (allUsers ?? [])
+    .filter((u) => u.created_at >= sevenDaysAgo)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 3)
+    
   const recentSignups = (allUsers ?? []).filter(
     (u) => u.created_at >= sevenDaysAgo
   ).length
@@ -113,7 +125,10 @@ export default async function AdminOverviewPage() {
   }
 
   const planOrder = ['free', 'starter', 'pro', 'enterprise']
-  const maxPlanCount = Math.max(...planOrder.map((p) => planBreakdown[p] ?? 0), 1)
+  const chartData = planOrder.map((name) => ({
+    name,
+    value: planBreakdown[name] ?? 0,
+  }))
 
   return (
     <div className="space-y-8">
@@ -153,43 +168,26 @@ export default async function AdminOverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Plan Breakdown ─────────────────────────────────────────────── */}
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <TrendingUp className="w-4 h-4" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <TrendingUp className="w-4 h-4 text-blue-500" />
               Users by Plan
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {planOrder.map((plan) => {
-              const count = planBreakdown[plan] ?? 0
-              const pct = Math.round((count / maxPlanCount) * 100)
-              return (
-                <div key={plan} className="space-y-1">
-                  <div className="flex justify-between text-sm font-medium text-slate-700">
-                    <span className="capitalize">{plan}</span>
-                    <span>{count}</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-blue-500 transition-all"
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </div>
-              )
-            })}
+          <CardContent className="pt-2">
+            <PlanChartClient data={chartData} />
           </CardContent>
         </Card>
 
         {/* ── System Status ──────────────────────────────────────────────── */}
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <AlertCircle className="w-4 h-4" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <AlertCircle className="w-4 h-4 text-amber-500" />
               System Status
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-4">
             {[
               { label: 'Supabase', healthy: supabaseHealthy },
               {
@@ -202,17 +200,17 @@ export default async function AdminOverviewPage() {
               },
             ].map(({ label, healthy }) => (
               <div key={label} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-700">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                   {label}
                 </span>
                 <div className="flex items-center gap-2">
                   <StatusDot healthy={healthy} />
                   <span
-                    className={`text-xs font-semibold ${
-                      healthy ? 'text-emerald-600' : 'text-red-600'
+                    className={`text-xs font-bold uppercase tracking-wider ${
+                      healthy ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
                     }`}
                   >
-                    {healthy ? 'Healthy' : 'Unavailable'}
+                    {healthy ? 'Live' : 'Down'}
                   </span>
                 </div>
               </div>
@@ -222,19 +220,50 @@ export default async function AdminOverviewPage() {
 
         {/* ── Recent Signups ─────────────────────────────────────────────── */}
         <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <Users className="w-4 h-4" />
-              Recent Signups (7 days)
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center justify-between text-sm font-semibold text-slate-700 dark:text-slate-300">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-violet-500" />
+                Recent Signups
+              </div>
+              <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded-full font-bold">
+                7 DAYS
+              </span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-5xl font-extrabold text-slate-900 tracking-tight">
-              {recentSignups}
-            </div>
-            <p className="text-sm text-slate-500 mt-1 font-medium">
-              new users registered
-            </p>
+          <CardContent className="pt-4">
+            {recentSignupsUsers.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-[180px] text-slate-400 dark:text-slate-500">
+                <Users className="w-8 h-8 mb-2 opacity-50" />
+                <p className="text-sm font-medium">No recent signups</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentSignupsUsers.map((u, i) => {
+                  const uName = (u as any).full_name || 'Anonymous User'
+                  const uEmail = (u as any).email || ''
+                  const initial = uName.charAt(0).toUpperCase()
+                  
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-400 flex items-center justify-center font-bold text-sm shrink-0">
+                        {initial}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 truncate">{uName}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{uEmail}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+                <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-slate-500 dark:text-slate-400">Total this week</span>
+                    <span className="font-bold text-slate-900 dark:text-slate-50">{recentSignups} users</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -28,11 +28,11 @@ export function StatCard({
   children,
 }: StatCardProps) {
   const variantStyles: Record<string, string> = {
-    default: 'bg-slate-50 text-slate-500',
-    primary: 'bg-blue-50 text-blue-600',
-    destructive: 'bg-red-50 text-red-500',
-    success: 'bg-emerald-50 text-emerald-500',
-    violet: 'bg-violet-50 text-violet-600',
+    default: 'bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400',
+    primary: 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    destructive: 'bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400',
+    success: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 dark:text-emerald-400',
+    violet: 'bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400',
   }
 
   const variantBorders: Record<string, string> = {
@@ -45,11 +45,11 @@ export function StatCard({
 
   return (
     <Card className={cn(
-      "relative overflow-hidden bg-white rounded-2xl border border-slate-200 border-t-[3px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md group",
+      "relative overflow-hidden bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800/80 border-t-[3px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md group",
       variantBorders[variant]
     )}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-6 px-6">
-        <CardTitle className="text-xs font-bold tracking-widest text-slate-500 uppercase">
+        <CardTitle className="text-xs font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">
           {label}
         </CardTitle>
         {Icon && (
@@ -62,7 +62,7 @@ export function StatCard({
         )}
       </CardHeader>
       <CardContent className="px-6 pb-6">
-        <div className="text-4xl font-extrabold tracking-tight text-slate-900 mt-2 mb-3">
+        <div className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-50 mt-2 mb-3">
           {value}
         </div>
         {trend && (
@@ -70,7 +70,9 @@ export function StatCard({
             <span
               className={cn(
                 'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-extrabold tracking-wider',
-                trend.isPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                trend.isPositive 
+                  ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' 
+                  : 'bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400'
               )}
             >
               {trend.isPositive ? (
@@ -80,7 +82,7 @@ export function StatCard({
               )}
               {trend.showPlus && trend.isPositive ? '+' : ''}{trend.value}
             </span>
-            <span className="text-[12px] text-slate-500 font-semibold">{trend.label}</span>
+            <span className="text-[12px] text-slate-500 dark:text-slate-400 font-semibold">{trend.label}</span>
           </div>
         )}
         {children && (
