@@ -17,7 +17,7 @@ export default async function AdminUsersPage() {
   if (profile?.role !== 'admin') redirect('/dashboard')
 
   // ── Fetch first page of users ─────────────────────────────────────────────
-  const { data: users, count } = await supabaseAdmin
+  const { data: users, count: totalUsers } = await supabaseAdmin
     .from('users')
     .select('id, full_name, email, plan, role, created_at, avatar_url', {
       count: 'exact',
@@ -25,11 +25,27 @@ export default async function AdminUsersPage() {
     .order('created_at', { ascending: false })
     .range(0, 19)
 
+  // ── Fetch summary stats ───────────────────────────────────────────────────
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  
+  const [
+    { count: newThisWeek },
+    { count: paidUsers }
+  ] = await Promise.all([
+    supabaseAdmin.from('users').select('id', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
+    supabaseAdmin.from('users').select('id', { count: 'exact', head: true }).neq('plan', 'free'),
+  ])
+
   return (
     <AdminUsersClient
       initialUsers={users ?? []}
-      total={count ?? 0}
+      total={totalUsers ?? 0}
       currentUserId={user.id}
+      stats={{
+        total: totalUsers ?? 0,
+        newThisWeek: newThisWeek ?? 0,
+        paid: paidUsers ?? 0,
+      }}
     />
   )
 }

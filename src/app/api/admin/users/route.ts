@@ -29,6 +29,8 @@ export async function GET(request: NextRequest) {
   const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'))
   const limit = Math.min(100, parseInt(searchParams.get('limit') ?? '20'))
   const q = searchParams.get('q')?.trim() ?? ''
+  const plan = searchParams.get('plan')?.trim() ?? 'all'
+  const role = searchParams.get('role')?.trim() ?? 'all'
   const from = (page - 1) * limit
   const to = from + limit - 1
 
@@ -40,6 +42,12 @@ export async function GET(request: NextRequest) {
 
   if (q) {
     query = query.or(`email.ilike.%${q}%,full_name.ilike.%${q}%`)
+  }
+  if (plan !== 'all') {
+    query = query.eq('plan', plan)
+  }
+  if (role !== 'all') {
+    query = query.eq('role', role)
   }
 
   const { data, error, count } = await query

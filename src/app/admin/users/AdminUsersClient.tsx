@@ -3,6 +3,7 @@
 import { useState, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { StatCard } from '@/components/layout/StatCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -36,7 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Search, MoreHorizontal, ChevronLeft, ChevronRight, Loader2, ShieldCheck, ShieldOff, UserCog } from 'lucide-react'
+import { Search, MoreHorizontal, ChevronLeft, ChevronRight, Loader2, ShieldCheck, ShieldOff, UserCog, Users, TrendingUp, DollarSign, Crown, CheckCircle, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -58,18 +59,23 @@ interface AdminUsersClientProps {
   initialUsers: AdminUser[]
   total: number
   currentUserId: string
+  stats: {
+    total: number
+    newThisWeek: number
+    paid: number
+  }
 }
 
 const PLAN_COLORS: Record<Plan, string> = {
   free: 'bg-slate-100 text-slate-700 border-slate-200',
-  starter: 'bg-blue-50 text-blue-700 border-blue-200',
-  pro: 'bg-violet-50 text-violet-700 border-violet-200',
-  enterprise: 'bg-amber-50 text-amber-700 border-amber-200',
+  starter: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  pro: 'bg-blue-50 text-blue-700 border-blue-200',
+  enterprise: 'bg-violet-50 text-violet-700 border-violet-200',
 }
 
 const ROLE_COLORS: Record<Role, string> = {
   user: 'bg-slate-100 text-slate-600',
-  admin: 'bg-emerald-50 text-emerald-700',
+  admin: 'bg-amber-50 text-amber-700 border-amber-200',
 }
 
 const PAGE_SIZE = 20
@@ -96,6 +102,7 @@ export function AdminUsersClient({
   initialUsers,
   total,
   currentUserId,
+  stats,
 }: AdminUsersClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -107,21 +114,28 @@ export function AdminUsersClient({
 
   // UI state
   const [search, setSearch] = useState('')
+  const [planFilter, setPlanFilter] = useState('all')
+  const [roleFilter, setRoleFilter] = useState('all')
+  
+  // Dialog state
   const [dialogUser, setDialogUser] = useState<AdminUser | null>(null)
-  const [dialogMode, setDialogMode] = useState<'plan' | 'role' | null>(null)
+  const [isManageDialogOpen, setIsManageDialogOpen] = useState(false)
   const [newPlan, setNewPlan] = useState<Plan>('free')
+  const [newRole, setNewRole] = useState<Role>('user')
   const [isSaving, setIsSaving] = useState(false)
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
   // ── Fetch users from API ───────────────────────────────────────────────────
   const fetchUsers = useCallback(
-    async (p: number, q: string) => {
+    async (p: number, q: string, pf: string, rf: string) => {
       startTransition(async () => {
         const params = new URLSearchParams({
           page: String(p),
           limit: String(PAGE_SIZE),
           q,
+          plan: pf,
+          role: rf
         })
         const res = await fetch(`/api/admin/users?${params}`)
         if (res.ok) {
@@ -137,35 +151,40 @@ export function AdminUsersClient({
   const handleSearch = (q: string) => {
     setSearch(q)
     setPage(1)
-    fetchUsers(1, q)
+    fetchUsers(1, q, planFilter, roleFilter)
+  }
+
+  const handlePlanFilterChange = (val: string) => {
+    setPlanFilter(val)
+    setPage(1)
+    fetchUsers(1, search, val, roleFilter)
+  }
+
+  const handleRoleFilterChange = (val: string) => {
+    setRoleFilter(val)
+    setPage(1)
+    fetchUsers(1, search, planFilter, val)
   }
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage)
-    fetchUsers(newPage, search)
+    fetchUsers(newPage, search, planFilter, roleFilter)
   }
 
   // ── Open dialogs ──────────────────────────────────────────────────────────
-  const openPlanDialog = (u: AdminUser) => {
+  const openManageDialog = (u: AdminUser) => {
     setDialogUser(u)
     setNewPlan(u.plan)
-    setDialogMode('plan')
-  }
-
-  const openRoleDialog = (u: AdminUser) => {
-    setDialogUser(u)
-    setDialogMode('role')
+    setNewRole(u.role)
+    setIsManageDialogOpen(true)
   }
 
   // ── Submit changes ─────────────────────────────────────────────────────────
   const handleSave = async () => {
-    if (!dialogUser || !dialogMode) return
+    if (!dialogUser) return
     setIsSaving(true)
 
-    const body =
-      dialogMode === 'plan'
-        ? { plan: newPlan }
-        : { role: dialogUser.role === 'admin' ? 'user' : 'admin' }
+    const body = { plan: newPlan, role: newRole }
 
     try {
       const res = await fetch(`/api/admin/users/${dialogUser.id}`, {
@@ -179,8 +198,8 @@ export function AdminUsersClient({
       } else {
         toast.success('User updated successfully.')
         setDialogUser(null)
-        setDialogMode(null)
-        fetchUsers(page, search)
+        setIsManageDialogOpen(false)
+        fetchUsers(page, search, planFilter, roleFilter)
         router.refresh()
       }
     } catch {
@@ -194,15 +213,66 @@ export function AdminUsersClient({
     <div className="space-y-6">
       <PageHeader title="Users" subtitle="Manage all registered users across CertiDraft." />
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-        <Input
-          placeholder="Search by name or email…"
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="pl-9 h-10"
+      {/* ── Summary Stats ──────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Users"
+          value={stats.total.toLocaleString()}
+          icon={Users}
+          variant="default"
         />
+        <StatCard
+          label="New This Week"
+          value={stats.newThisWeek.toLocaleString()}
+          icon={TrendingUp}
+          variant="success"
+          trend={{ value: 'Last 7 days', label: '', isPositive: true }}
+        />
+        <StatCard
+          label="Paid Users"
+          value={stats.paid.toLocaleString()}
+          icon={DollarSign}
+          variant="primary"
+        />
+      </div>
+
+      {/* ── Filters & Search ───────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+        <div className="relative w-full sm:max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Input
+            placeholder="Search by name or email…"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="pl-9 h-10 bg-white"
+          />
+        </div>
+        
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <Select value={planFilter} onValueChange={handlePlanFilterChange}>
+            <SelectTrigger className="w-[140px] h-10 bg-white">
+              <SelectValue placeholder="All Plans" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Plans</SelectItem>
+              <SelectItem value="free">Free</SelectItem>
+              <SelectItem value="starter">Starter</SelectItem>
+              <SelectItem value="pro">Pro</SelectItem>
+              <SelectItem value="enterprise">Enterprise</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={roleFilter} onValueChange={handleRoleFilterChange}>
+            <SelectTrigger className="w-[140px] h-10 bg-white">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="user">User</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Table */}
@@ -211,8 +281,7 @@ export function AdminUsersClient({
           <TableHeader>
             <TableRow className="bg-slate-50">
               <TableHead className="w-10"></TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
+              <TableHead>User</TableHead>
               <TableHead>Plan</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Joined</TableHead>
@@ -234,32 +303,38 @@ export function AdminUsersClient({
               </TableRow>
             ) : (
               users.map((u) => (
-                <TableRow key={u.id} className="hover:bg-slate-50/60">
+                <TableRow key={u.id} className="hover:bg-slate-50/60 group">
                   <TableCell>
                     <UserInitials name={u.full_name} email={u.email} />
                   </TableCell>
-                  <TableCell className="font-semibold text-slate-800">
-                    {u.full_name ?? '—'}
-                    {u.id === currentUserId && (
-                      <span className="ml-2 text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
-                        You
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-slate-800 flex items-center gap-2">
+                        {u.full_name ?? '—'}
+                        {u.id === currentUserId && (
+                          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">
+                            You
+                          </span>
+                        )}
                       </span>
-                    )}
+                      <span className="text-xs text-slate-500">{u.email}</span>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-slate-600">{u.email}</TableCell>
                   <TableCell>
                     <Badge
                       variant="outline"
-                      className={`capitalize font-semibold ${PLAN_COLORS[u.plan ?? 'free']}`}
+                      className={`capitalize font-semibold inline-flex items-center gap-1 border ${PLAN_COLORS[u.plan ?? 'free']}`}
                     >
+                      {u.plan !== 'free' && <CheckCircle className="h-3 w-3" />}
                       {u.plan ?? 'free'}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <Badge
                       variant="secondary"
-                      className={`capitalize font-semibold ${ROLE_COLORS[u.role ?? 'user']}`}
+                      className={`capitalize font-semibold inline-flex items-center gap-1 border ${ROLE_COLORS[u.role ?? 'user']}`}
                     >
+                      {u.role === 'admin' ? <Crown className="h-3 w-3" /> : <ShieldCheck className="h-3 w-3" />}
                       {u.role ?? 'user'}
                     </Badge>
                   </TableCell>
@@ -267,40 +342,31 @@ export function AdminUsersClient({
                     {new Date(u.created_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Actions</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => openPlanDialog(u)}>
-                          <UserCog className="mr-2 h-4 w-4" />
-                          Change Plan
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {u.id === currentUserId ? (
-                          <DropdownMenuItem disabled className="text-slate-400">
-                            <ShieldOff className="mr-2 h-4 w-4" />
-                            Cannot edit self role
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openManageDialog(u)}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity h-8 px-2 text-slate-500 hover:text-slate-900"
+                      >
+                        <Pencil className="h-3.5 w-3.5 mr-1.5" />
+                        Manage
+                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => openManageDialog(u)}>
+                            <UserCog className="mr-2 h-4 w-4" />
+                            Manage User
                           </DropdownMenuItem>
-                        ) : u.role === 'admin' ? (
-                          <DropdownMenuItem
-                            onClick={() => openRoleDialog(u)}
-                            className="text-red-600 focus:text-red-700 focus:bg-red-50"
-                          >
-                            <ShieldOff className="mr-2 h-4 w-4" />
-                            Remove Admin
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem onClick={() => openRoleDialog(u)}>
-                            <ShieldCheck className="mr-2 h-4 w-4" />
-                            Make Admin
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -340,66 +406,60 @@ export function AdminUsersClient({
         </div>
       )}
 
-      {/* Change Plan Dialog */}
-      <Dialog open={dialogMode === 'plan'} onOpenChange={() => setDialogMode(null)}>
+      {/* ── Manage User Dialog ─────────────────────────────────────────────────── */}
+      <Dialog open={isManageDialogOpen} onOpenChange={setIsManageDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Change Plan</DialogTitle>
+            <DialogTitle>Manage User</DialogTitle>
             <DialogDescription>
-              Update the subscription plan for{' '}
+              Update the subscription plan and role for{' '}
               <strong>{dialogUser?.full_name ?? dialogUser?.email}</strong>.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <Select value={newPlan} onValueChange={(v) => setNewPlan(v as Plan)}>
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Select plan" />
-              </SelectTrigger>
-              <SelectContent>
-                {(['free', 'starter', 'pro', 'enterprise'] as Plan[]).map((p) => (
-                  <SelectItem key={p} value={p} className="capitalize">
-                    {p.charAt(0).toUpperCase() + p.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Subscription Plan</label>
+              <Select value={newPlan} onValueChange={(v) => setNewPlan(v as Plan)}>
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Select plan" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(['free', 'starter', 'pro', 'enterprise'] as Plan[]).map((p) => (
+                    <SelectItem key={p} value={p} className="capitalize">
+                      {p.charAt(0).toUpperCase() + p.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">User Role</label>
+              <Select 
+                value={newRole} 
+                onValueChange={(v) => setNewRole(v as Role)}
+                disabled={dialogUser?.id === currentUserId}
+              >
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+              {dialogUser?.id === currentUserId && (
+                <p className="text-xs text-slate-500 mt-1">You cannot change your own role.</p>
+              )}
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogMode(null)} disabled={isSaving}>
+            <Button variant="outline" onClick={() => setIsManageDialogOpen(false)} disabled={isSaving}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isSaving || newPlan === dialogUser?.plan}>
+            <Button onClick={handleSave} disabled={isSaving || (newPlan === dialogUser?.plan && newRole === dialogUser?.role)}>
               {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Save Changes
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Change Role Dialog */}
-      <Dialog open={dialogMode === 'role'} onOpenChange={() => setDialogMode(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {dialogUser?.role === 'admin' ? 'Remove Admin Access' : 'Grant Admin Access'}
-            </DialogTitle>
-            <DialogDescription>
-              {dialogUser?.role === 'admin'
-                ? `This will revoke admin privileges from ${dialogUser?.full_name ?? dialogUser?.email}.`
-                : `This will grant full admin access to ${dialogUser?.full_name ?? dialogUser?.email}. They will be able to manage all users, templates, and platform data.`}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogMode(null)} disabled={isSaving}>
-              Cancel
-            </Button>
-            <Button
-              variant={dialogUser?.role === 'admin' ? 'destructive' : 'default'}
-              onClick={handleSave}
-              disabled={isSaving}
-            >
-              {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {dialogUser?.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
             </Button>
           </DialogFooter>
         </DialogContent>
