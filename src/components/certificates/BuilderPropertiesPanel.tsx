@@ -25,6 +25,8 @@ import {
   Paintbrush,
   Plus,
   Loader2,
+  QrCode,
+  ShieldCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -172,6 +174,7 @@ export function BuilderPropertiesPanel() {
   const displayType = selectedElement.type
   const isText = type === 'fabrictext' || type === 'text' || type === 'i-text' || type === 'textbox'
   const isShape = type === 'rect' || type === 'circle' || type === 'ellipse' || type === 'triangle'
+  const isQRCode = !!(selectedElement as any).isQRCode
 
   return (
     <div className="w-[260px] border-l border-slate-200 bg-white flex flex-col shrink-0 overflow-y-auto">
@@ -183,14 +186,82 @@ export function BuilderPropertiesPanel() {
           <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider">Properties</h3>
         </div>
         <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-          {displayType}
+          {isQRCode ? 'QR Code' : displayType}
         </span>
       </div>
 
       <div className="p-4 space-y-5 flex-1">
 
+        {/* -- QR Code Properties (special case) ----------------------- */}
+        {isQRCode && (
+          <div className="space-y-4">
+            <SectionHeader>Verification QR Code</SectionHeader>
+
+            {/* Informational banner */}
+            <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-3 flex gap-3 items-start">
+              <ShieldCheck className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-bold text-indigo-800 mb-1">Dynamic Verification Link</p>
+                <p className="text-[11px] text-indigo-600 leading-relaxed">
+                  This QR code is a <strong>placeholder</strong>. When you generate certificates, each recipient will automatically receive a unique QR code linked to their personal verification page.
+                </p>
+              </div>
+            </div>
+
+            {/* Preview of what the QR encodes */}
+            <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Encodes</p>
+              <code className="text-[11px] font-mono text-indigo-600 break-all leading-relaxed">
+                /verify/{'{'}{'{'}verification_token{'}'}{'}'}
+              </code>
+            </div>
+
+            {/* Icon to make it feel interactive */}
+            <div className="flex justify-center py-2">
+              <div className="p-4 bg-slate-100 rounded-2xl">
+                <QrCode className="h-12 w-12 text-slate-400" />
+              </div>
+            </div>
+
+            {/* Size controls still allowed */}
+            <SectionHeader>Position &amp; Size</SectionHeader>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: 'X', value: Math.round((selectedElement as any).left ?? 0), key: 'left' },
+                { label: 'Y', value: Math.round((selectedElement as any).top ?? 0), key: 'top' },
+              ].map(({ label, value, key }) => (
+                <div key={key} className="space-y-1.5">
+                  <label className="text-[11px] text-slate-500">{label}</label>
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 font-mono">{label}</span>
+                    <input
+                      type="number"
+                      value={value}
+                      onChange={(e) => updateProp(key, Number(e.target.value))}
+                      className="h-8 text-xs bg-slate-50 border border-slate-200 text-slate-800 rounded-md w-full pl-6 focus:outline-none focus:border-indigo-400"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex justify-between">
+                <label className="text-[11px] text-slate-500">Scale</label>
+                <span className="text-[11px] font-mono text-slate-400">{Math.round(((selectedElement as any).scaleX ?? 1) * 100)}%</span>
+              </div>
+              <Slider
+                min={0.1} max={2} step={0.05}
+                value={[(selectedElement as any).scaleX ?? 1]}
+                onValueChange={([val]) => { updateProp('scaleX', val); updateProp('scaleY', val) }}
+                className="[&_[role=slider]]:bg-indigo-500 [&_[role=slider]]:border-indigo-400"
+              />
+            </div>
+          </div>
+        )}
+
         {/* -- Typography (Text only) ---------------------------------- */}
-        {isText && (
+        {isText && !isQRCode && (
           <div className="space-y-3">
             <SectionHeader>Typography</SectionHeader>
 
@@ -326,7 +397,7 @@ export function BuilderPropertiesPanel() {
         )}
 
         {/* -- Fill & Stroke (Shapes) ---------------------------------- */}
-        {isShape && (
+        {isShape && !isQRCode && (
           <div className="space-y-3">
             <SectionHeader>Appearance</SectionHeader>
 
@@ -371,8 +442,9 @@ export function BuilderPropertiesPanel() {
         )}
 
         {/* -- Positioning -------------------------------------------- */}
+        {!isQRCode && (
         <div className="space-y-3">
-          <SectionHeader>Position & Size</SectionHeader>
+          <SectionHeader>Position &amp; Size</SectionHeader>
           <div className="grid grid-cols-2 gap-2">
             {[
               { label: 'X', value: Math.round((selectedElement as any).left ?? 0), key: 'left' },
@@ -393,8 +465,10 @@ export function BuilderPropertiesPanel() {
             ))}
           </div>
         </div>
+        )}
 
         {/* -- Layer Order -------------------------------------------- */}
+        {!isQRCode && (
         <div className="space-y-2">
           <SectionHeader>Layer Order</SectionHeader>
           <div className="grid grid-cols-2 gap-2">
@@ -424,6 +498,7 @@ export function BuilderPropertiesPanel() {
             </button>
           </div>
         </div>
+        )}
 
       </div>
     </div>

@@ -18,6 +18,8 @@ import {
   Minus,
   Variable,
   LayoutGrid,
+  QrCode,
+  Loader2,
 } from 'lucide-react'
 
 function getObjectIcon(type?: string) {
@@ -66,6 +68,7 @@ export function BuilderLayersPanel() {
   const { canvas, selectedElement, setSelectedElement, pushHistory } = useCanvasStore()
   const [objects, setObjects] = React.useState<fabric.Object[]>([])
   const [activeTab, setActiveTab] = React.useState<'layers' | 'elements' | 'variables'>('layers')
+  const [isAddingQR, setIsAddingQR] = React.useState(false)
 
   const refreshObjects = React.useCallback(() => {
     if (!canvas) return
@@ -145,6 +148,30 @@ export function BuilderLayersPanel() {
     canvas.setActiveObject(obj)
     canvas.requestRenderAll()
     pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
+  }
+
+  const addQRCode = async () => {
+    if (!canvas || isAddingQR) return
+    setIsAddingQR(true)
+    try {
+      // Use a placeholder QR code that encodes the verification URL pattern
+      const placeholderUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://certidraft.com/verify/{{verification_token}}')}&bgcolor=ffffff&color=1e293b&format=png`
+      const imgEl = await fabric.FabricImage.fromURL(placeholderUrl, { crossOrigin: 'anonymous' })
+      imgEl.set({
+        left: 421, top: 297,
+        originX: 'center', originY: 'center',
+        scaleX: 0.6, scaleY: 0.6,
+      });     
+      (imgEl as any).isQRCode = true
+      canvas.add(imgEl)
+      canvas.setActiveObject(imgEl)
+      canvas.requestRenderAll()
+      pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
+    } catch (err) {
+      console.error('Failed to add QR code:', err)
+    } finally {
+      setIsAddingQR(false)
+    }
   }
 
   const addVariableText = (variable: string) => {
@@ -282,6 +309,26 @@ export function BuilderLayersPanel() {
             >
               <Type className="h-4 w-4" />
               <span className="text-xs font-medium">Add Text Block</span>
+            </button>
+          </div>
+
+          {/* Widgets Section */}
+          <div>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Widgets</p>
+            <button
+              onClick={addQRCode}
+              disabled={isAddingQR}
+              className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 hover:border-indigo-400 text-indigo-600 hover:text-indigo-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isAddingQR ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <QrCode className="h-4 w-4" />
+              )}
+              <div className="text-left">
+                <span className="text-xs font-semibold block">Verification QR Code</span>
+                <span className="text-[10px] text-indigo-400 font-medium">Dynamic — auto-fills on generate</span>
+              </div>
             </button>
           </div>
         </div>
