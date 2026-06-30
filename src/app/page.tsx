@@ -90,7 +90,8 @@ export default function LandingPage() {
         {/* ── 1. Animated Hero Section ────────────────────────────────────── */}
         <section className="relative pt-24 pb-32 px-6 overflow-hidden bg-white border-b border-slate-200">
           {/* Subtle animated background gradients & floating certificates */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] opacity-30 pointer-events-none">
+          <div className="absolute top-0 inset-x-0 h-[800px] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(99,102,241,0.15),rgba(255,255,255,0))] pointer-events-none z-0"></div>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1000px] h-[500px] opacity-30 pointer-events-none z-0">
             <motion.div 
               animate={{ x: [0, 50, 0], y: [0, 30, 0] }}
               transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -493,44 +494,38 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-12 gap-12 items-center">
-              {/* Tabs List */}
-              <div className="lg:col-span-5 flex flex-col gap-4">
-                {tabs.map((tab, idx) => {
-                  const isActive = activeTab === idx
-                  const Icon = tab.icon
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveTab(idx)}
-                      className={`text-left p-6 rounded-2xl transition-all duration-300 border-2 ${
-                        isActive 
-                        ? 'bg-blue-50 border-blue-200 shadow-md transform scale-[1.02]' 
-                        : 'bg-white border-transparent hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
-                          isActive ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'bg-slate-100 text-slate-500'
-                        }`}>
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h3 className={`text-xl font-bold tracking-tight ${isActive ? 'text-blue-900' : 'text-slate-700'}`}>
-                            {tab.title}
-                          </h3>
-                          <p className={`font-medium mt-1 ${isActive ? 'text-blue-700' : 'text-slate-500'}`}>
-                            {tab.desc}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  )
-                })}
+            {/* Horizontal Stepper */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center relative mb-12 max-w-4xl mx-auto">
+              <div className="absolute top-6 left-12 right-12 h-1 bg-slate-100 hidden md:block -z-10 rounded-full">
+                 {/* Optional: animated progress bar here */}
               </div>
+              {tabs.map((tab, idx) => {
+                const isActive = activeTab === idx
+                const isPast = activeTab > idx
+                const Icon = tab.icon
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveTab(idx)}
+                    className="relative flex flex-col items-center group mb-8 md:mb-0 w-32"
+                  >
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center border-4 border-white transition-all duration-500 shadow-sm ${
+                      isActive ? 'bg-blue-600 text-white shadow-blue-200 scale-110' :
+                      isPast ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
+                    }`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div className="mt-4 text-center">
+                      <div className={`font-extrabold text-sm transition-colors ${isActive ? 'text-blue-900' : 'text-slate-600'}`}>{tab.title}</div>
+                      <div className={`text-xs mt-1 hidden md:block transition-colors ${isActive ? 'text-blue-700 font-medium' : 'text-slate-400'}`}>{tab.desc}</div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
 
-              {/* Display Area */}
-              <div className="lg:col-span-7 h-[450px] relative">
+            {/* Display Area */}
+            <div className="w-full max-w-4xl mx-auto h-[450px] relative">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeTab}
@@ -609,7 +604,6 @@ export default function LandingPage() {
                   </motion.div>
                 </AnimatePresence>
               </div>
-            </div>
 
           </div>
         </section>
@@ -701,7 +695,7 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-center">
               
               {/* Starter */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+              <div className="bg-slate-50 border-t-4 border-t-slate-300 border-x border-b border-x-slate-200 border-b-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
                 <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Starter</h3>
                 <p className="text-slate-500 font-medium text-sm mt-2">For small events</p>
                 <div className="mt-6 flex items-baseline gap-1 mb-8">
@@ -731,8 +725,8 @@ export default function LandingPage() {
               </div>
 
               {/* Pro (Highlighted) */}
-              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.2)] transform md:scale-105 relative z-10">
-                <div className="absolute -top-4 inset-x-0 flex justify-center">
+              <div className="bg-slate-900 border-t-4 border-t-blue-500 border-x border-b border-slate-800 rounded-3xl p-8 shadow-[0_20px_50px_rgba(0,0,0,0.2)] transform md:scale-105 relative z-10">
+                <div className="absolute -top-5 inset-x-0 flex justify-center">
                   <span className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-extrabold tracking-widest uppercase px-6 py-1.5 rounded-full shadow-lg">
                     Most Popular
                   </span>
@@ -771,7 +765,7 @@ export default function LandingPage() {
               </div>
 
               {/* Enterprise */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
+              <div className="bg-slate-50 border-t-4 border-t-indigo-400 border-x border-b border-x-slate-200 border-b-slate-200 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-shadow">
                 <h3 className="text-2xl font-extrabold text-slate-900 tracking-tight">Enterprise</h3>
                 <p className="text-slate-500 font-medium text-sm mt-2">For huge scale operations</p>
                 <div className="mt-6 flex items-baseline gap-1 mb-8">
@@ -800,6 +794,65 @@ export default function LandingPage() {
                 </Button>
               </div>
 
+            </div>
+          </div>
+        </section>
+
+        {/* ── 7. Testimonials ─────────────────────────────────────────────── */}
+        <section className="py-32 bg-white border-b border-slate-200 px-6">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <h2 className="font-sans text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+                Loved by certificate issuers everywhere
+              </h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { quote: "CertiDraft cut our certificate issuing time from 3 hours to literally 5 minutes. The visual builder is a game-changer.", author: "Sarah Jenkins", role: "Event Manager, TechConf", rating: 5, initial: "S", color: "bg-blue-100 text-blue-700" },
+                { quote: "We issue over 5,000 certificates a month. The batch generation and verifiable QRs have eliminated fraud and saved us thousands.", author: "Dr. Marcus Chen", role: "Dean, Global Academy", rating: 5, initial: "M", color: "bg-emerald-100 text-emerald-700" },
+                { quote: "The AI generator is magic. I just type 'Hackathon Winner' and it gives me a beautiful, professional template instantly.", author: "Elena Rodriguez", role: "Community Lead", rating: 5, initial: "E", color: "bg-purple-100 text-purple-700" }
+              ].map((t, i) => (
+                <div key={i} className="bg-slate-50 rounded-3xl p-8 border border-slate-200 flex flex-col">
+                  <div className="flex gap-1 mb-6">
+                    {[...Array(t.rating)].map((_, j) => <svg key={j} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#F59E0B" className="w-5 h-5"><path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" /></svg>)}
+                  </div>
+                  <p className="text-slate-700 font-medium leading-relaxed mb-8 flex-1">"{t.quote}"</p>
+                  <div className="flex items-center gap-4 mt-auto">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-extrabold text-lg ${t.color}`}>
+                      {t.initial}
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900">{t.author}</div>
+                      <div className="text-sm text-slate-500 font-medium">{t.role}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 8. CTA Banner ────────────────────────────────────────────────── */}
+        <section className="py-24 px-6 bg-white">
+          <div className="container mx-auto max-w-5xl">
+            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[3rem] p-12 md:p-20 text-center shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
+              
+              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight relative z-10">
+                Ready to start issuing professional certificates?
+              </h2>
+              <p className="text-lg text-slate-300 font-medium mb-10 max-w-2xl mx-auto relative z-10">
+                Join thousands of organizations saving time and money with CertiDraft. Create your first template in seconds.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
+                <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-8 h-14 font-bold text-lg shadow-lg shadow-blue-900/50 transition-transform hover:-translate-y-1" asChild>
+                  <Link href="/auth/signup">Get Started Free</Link>
+                </Button>
+                <Button variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800 rounded-full px-8 h-14 font-bold text-lg transition-colors" asChild>
+                  <Link href="#templates">View Templates</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
