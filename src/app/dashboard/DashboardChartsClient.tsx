@@ -10,7 +10,8 @@ import {
   CartesianGrid,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Activity } from 'lucide-react'
+import { Activity, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -80,14 +81,50 @@ export function DashboardChartsClient({ data }: DashboardChartsClientProps) {
       
       <CardContent className="pt-6 pb-2 flex-1 min-h-[300px]">
         {data.length === 0 || totalInPeriod === 0 ? (
-          <div className="h-full w-full flex flex-col items-center justify-center bg-slate-50/50 rounded-xl border border-dashed border-slate-200 py-12">
-            <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-4 shadow-sm">
-               <Activity className="w-6 h-6 text-indigo-400" />
+          <div className="relative h-[280px] w-full rounded-xl overflow-hidden">
+            {/* Blurred ghost chart in the background */}
+            <div className="absolute inset-0 blur-[3px] opacity-40 pointer-events-none select-none">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={[
+                    { date: '01', count: 2 }, { date: '03', count: 5 }, { date: '06', count: 3 },
+                    { date: '09', count: 8 }, { date: '12', count: 6 }, { date: '15', count: 11 },
+                    { date: '18', count: 7 }, { date: '21', count: 14 }, { date: '24', count: 9 },
+                    { date: '27', count: 16 }, { date: '30', count: 12 },
+                  ]}
+                  margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient id="ghostGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis dataKey="date" hide />
+                  <YAxis hide />
+                  <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#ghostGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-            <p className="text-slate-900 font-extrabold text-[15px] mb-1">No activity yet</p>
-            <p className="text-slate-500 text-[13px] font-medium max-w-[250px] text-center leading-relaxed">
-              Create your first project to start tracking generation trends.
-            </p>
+            {/* CTA Overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70 backdrop-blur-[1px] rounded-xl">
+              <div className="bg-white rounded-2xl border border-indigo-100 shadow-xl p-6 text-center max-w-xs">
+                <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center mb-3 mx-auto">
+                  <Sparkles className="w-6 h-6 text-indigo-500" />
+                </div>
+                <p className="text-slate-900 font-extrabold text-[15px] mb-1">No activity yet</p>
+                <p className="text-slate-500 text-[13px] font-medium leading-relaxed mb-4">
+                  Generate your first certificate to see your trends come to life.
+                </p>
+                <Link
+                  href="/dashboard/projects"
+                  className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-full transition-colors shadow-md shadow-indigo-200"
+                >
+                  Create a Project
+                </Link>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="h-[260px] w-full">
