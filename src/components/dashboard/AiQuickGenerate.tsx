@@ -16,7 +16,19 @@ export function AiQuickGenerate({ isOnboarding = false }: AiQuickGenerateProps) 
   const [description, setDescription] = React.useState('')
   const [isGenerating, setIsGenerating] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [isDismissed, setIsDismissed] = React.useState(false)
   const router = useRouter()
+
+  React.useEffect(() => {
+    if (localStorage.getItem('certidraft_onboarding_dismissed') === 'true') {
+      setIsDismissed(true)
+    }
+  }, [])
+
+  const handleDismiss = () => {
+    setIsDismissed(true)
+    localStorage.setItem('certidraft_onboarding_dismissed', 'true')
+  }
 
   const handleGenerate = async () => {
     if (!description.trim()) return
@@ -47,9 +59,16 @@ export function AiQuickGenerate({ isOnboarding = false }: AiQuickGenerateProps) 
     }
   }
 
-  if (isOnboarding) {
+  if (isOnboarding && !isDismissed) {
     return (
       <div className="mb-10 relative overflow-hidden rounded-3xl bg-white p-8 sm:p-10 shadow-[0_2px_20px_rgba(0,0,0,0.04)] border border-indigo-100 flex flex-col gap-8">
+        {/* Skip Button */}
+        <button 
+          onClick={handleDismiss}
+          className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 text-sm font-medium z-20 transition-colors"
+        >
+          Skip for now
+        </button>
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/80 via-white to-white pointer-events-none" />
         
         <div className="relative z-10 text-center max-w-2xl mx-auto mb-4">
