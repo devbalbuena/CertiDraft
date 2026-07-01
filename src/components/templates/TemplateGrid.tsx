@@ -21,6 +21,7 @@ export type TemplateRow = {
   is_featured: boolean
   is_public: boolean
   creator_id: string | null
+  creator_name: string | null
   created_at: string
   uses: number
 }
@@ -33,7 +34,7 @@ interface TemplateGridProps {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const CATEGORIES = ['All', 'Corporate', 'Academic', 'Sports', 'Recognition', 'Other']
+const CATEGORIES = ['All', 'Community', 'Corporate', 'Academic', 'Sports', 'Recognition', 'Other']
 
 const categoryBadgeColors: Record<string, string> = {
   Corporate: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -147,6 +148,12 @@ function TemplateCard({
 
         {/* Preview CTA */}
         <div className={`${compact ? 'mt-2' : 'mt-4'}`}>
+          {/* Creator badge for community templates */}
+          {template.creator_name && (
+            <p className="text-[10px] text-slate-400 font-medium mb-1.5 truncate">
+              By <span className="text-indigo-500 font-semibold">{template.creator_name}</span>
+            </p>
+          )}
           <div className="w-full bg-slate-900 group-hover:bg-blue-600 dark:bg-slate-100 dark:text-slate-900 dark:group-hover:bg-blue-600 dark:group-hover:text-white text-white font-semibold rounded-lg h-8 text-xs flex items-center justify-center transition-colors duration-200">
             Preview &amp; Use
           </div>
@@ -283,21 +290,43 @@ export function TemplateGrid({ templates, recommendedTemplates, currentUserId }:
 
         {/* Tab content panels */}
         {CATEGORIES.map((cat) => {
-          const base = cat === 'All' ? templates : templates.filter((t) => t.category === cat)
+          let base: TemplateRow[]
+          if (cat === 'All') {
+            base = templates
+          } else if (cat === 'Community') {
+            // Community = all templates with a real creator_name (user-published)
+            base = templates.filter((t) => !!t.creator_name)
+          } else {
+            base = templates.filter((t) => t.category === cat && !t.creator_name)
+          }
           const filtered = filterTemplates(base)
           const isOther = cat === 'Other'
 
           return (
             <TabsContent key={cat} value={cat} className="mt-0">
               {filtered.length === 0 && !isOther ? (
-                <div className="text-center py-20">
-                  {search ? (
-                    <p className="text-slate-400 dark:text-slate-600 font-medium">
-                      No templates match &ldquo;{search}&rdquo;.
-                    </p>
+                <div className="text-center py-20 flex flex-col items-center gap-4">
+                  {cat === 'Community' && !search ? (
+                    <>
+                      <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                        <Sparkles className="h-7 w-7 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-700 dark:text-slate-300 text-sm">
+                          No community templates yet
+                        </p>
+                        <p className="text-xs text-slate-400 mt-1.5 max-w-[280px] leading-relaxed">
+                          Design a certificate in the builder and click{' '}
+                          <span className="font-semibold text-indigo-500">Publish</span> to share
+                          it with everyone here.
+                        </p>
+                      </div>
+                    </>
                   ) : (
                     <p className="text-slate-400 dark:text-slate-600 font-medium">
-                      No templates in this category yet.
+                      {search
+                        ? `No templates match "${search}".`
+                        : 'No templates in this category yet.'}
                     </p>
                   )}
                 </div>
