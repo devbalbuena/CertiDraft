@@ -21,8 +21,14 @@ CertiDraft is a comprehensive, full-stack certificate generation platform design
 **Project & Certificate Management**
 - Create and organize isolated certificate projects
 - Track generated certificate counts and project statuses
-- Global templates gallery for quick starts
+- Global and Community templates gallery for quick starts
 - Dedicated Certificates list view with search, pagination, and quick actions
+
+**Marketplace & Credits Economy**
+- Virtual credits system to power template transactions
+- Creators can publish and monetize custom certificate designs
+- Users can purchase premium templates using credits
+- Live credit balance tracker built into the dashboard
 
 **Certificate Designer**
 - Advanced drag-and-drop canvas powered by Fabric.js
@@ -108,8 +114,8 @@ workers/                  # Node.js background worker processes
 ## Database Schema
 
 - **`users`**
-  - Columns: `id`, `email`, `full_name`, `avatar_url`, `plan`, `certificates_this_month`, `role`, `wallet_slug`, `wallet_title`, `wallet_is_public`
-  - Purpose: Stores user profiles, active subscription limits, and public wallet configuration.
+  - Columns: `id`, `email`, `full_name`, `avatar_url`, `plan`, `certificates_this_month`, `role`, `wallet_slug`, `wallet_title`, `wallet_is_public`, `credits`
+  - Purpose: Stores user profiles, active subscription limits, public wallet configuration, and virtual credit balance.
 - **`projects`**
   - Columns: `id`, `user_id`, `name`, `description`, `event_type`, `elements`, `certificate_count`, `status`, `template_id`
   - Purpose: Represents a campaign. Links to the user and stores the JSON definition of the certificate design.
@@ -120,8 +126,11 @@ workers/                  # Node.js background worker processes
   - Columns: `id`, `user_id`, `project_id`, `recipient_name`, `recipient_email`, `achievement`, `grade`, `issued_date`, `verification_token`, `storage_path`, `storage_bucket`, `last_email_sent_at`
   - Purpose: Stores individual issued certificates, verification tokens, and Supabase Storage paths.
 - **`templates`**
-  - Columns: `id`, `name`, `description`, `elements`, `thumbnail_url`
-  - Purpose: Global predefined templates that users can clone into their own projects.
+  - Columns: `id`, `name`, `description`, `elements`, `thumbnail_url`, `price`, `creator_id`, `is_public`
+  - Purpose: Predefined system templates and community-created designs that users can use or purchase.
+- **`template_purchases`**
+  - Columns: `id`, `buyer_id`, `template_id`, `price_paid`, `purchased_at`
+  - Purpose: Tracks the ledger of premium templates purchased by users using credits.
 
 ## Local Setup Instructions
 
