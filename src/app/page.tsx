@@ -832,31 +832,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── 8. CTA Banner ────────────────────────────────────────────────── */}
-        <section className="py-24 px-6 bg-white">
-          <div className="container mx-auto max-w-5xl">
-            <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 rounded-[3rem] p-12 md:p-20 text-center shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
-              <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px] -translate-x-1/3 translate-y-1/3 pointer-events-none"></div>
-              
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight relative z-10">
-                Ready to start issuing professional certificates?
-              </h2>
-              <p className="text-lg text-slate-300 font-medium mb-10 max-w-2xl mx-auto relative z-10">
-                Join thousands of organizations saving time and money with CertiDraft. Create your first template in seconds.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 relative z-10">
-                <Button className="bg-blue-600 hover:bg-blue-500 text-white rounded-full px-8 h-14 font-bold text-lg shadow-lg shadow-blue-900/50 transition-transform hover:-translate-y-1" asChild>
-                  <Link href="/auth/signup">Get Started Free</Link>
-                </Button>
-                <Button variant="outline" className="bg-transparent border-slate-700 text-white hover:bg-slate-800 rounded-full px-8 h-14 font-bold text-lg transition-colors" asChild>
-                  <Link href="#templates">View Templates</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-
       </main>
 
       {/* ── Footer ──────────────────────────────────────────────────────── */}
