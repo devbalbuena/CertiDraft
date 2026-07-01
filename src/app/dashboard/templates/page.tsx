@@ -55,6 +55,14 @@ export default async function TemplatesPage() {
     .eq('user_id', user.id)
     .not('event_type', 'is', null)
 
+  // ── 4. Fetch User's Purchased Templates ─────────────────────────────────────
+  const { data: purchases } = await supabase
+    .from('template_purchases')
+    .select('template_id')
+    .eq('buyer_id', user.id)
+  
+  const purchasedIds = purchases?.map(p => p.template_id) ?? []
+
   // Tally event_type frequencies
   const eventTypeCount: Record<string, number> = {}
   for (const p of userProjects ?? []) {
@@ -123,6 +131,7 @@ export default async function TemplatesPage() {
           templates={allTemplates}
           recommendedTemplates={recommendedTemplates}
           currentUserId={user.id}
+          purchasedTemplateIds={purchasedIds}
         />
       )}
     </div>

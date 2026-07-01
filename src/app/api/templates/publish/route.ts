@@ -7,6 +7,7 @@ const publishSchema = z.object({
   name: z.string().min(1, 'Template name is required').max(100),
   category: z.enum(['Corporate', 'Academic', 'Sports', 'Recognition', 'Other']),
   description: z.string().max(300).optional(),
+  price: z.number().int().min(0).max(500).default(0),
 })
 
 // ── POST /api/templates/publish ───────────────────────────────────────────────
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { project_id, name, category, description } = parsed.data
+  const { project_id, name, category, description, price } = parsed.data
 
   // 1. Fetch the project canvas state & verify ownership
   const { data: project, error: projectError } = await supabase
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
       is_featured: false,
       creator_id: user.id,
       creator_name: creatorName,
+      price: price ?? 0,
       canvas_state: typeof project.elements === 'string'
         ? project.elements
         : JSON.stringify(project.elements),

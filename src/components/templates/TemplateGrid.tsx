@@ -22,6 +22,7 @@ export type TemplateRow = {
   is_public: boolean
   creator_id: string | null
   creator_name: string | null
+  price: number
   created_at: string
   uses: number
 }
@@ -103,14 +104,30 @@ function TemplateCard({
       {/* Card body */}
       <div className={`${compact ? 'p-3' : 'p-5'} flex flex-col flex-1`}>
         {/* Name + category badge */}
-        <div className="flex items-start justify-between gap-2 mb-1.5">
+        <div className="flex flex-col gap-2 mb-2">
           <h3 className={`font-bold text-slate-900 dark:text-slate-100 leading-tight line-clamp-1 ${compact ? 'text-sm' : 'text-base'}`}>
             {template.name}
           </h3>
+
           {!compact && (
-            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border flex-shrink-0 ${badgeClass}`}>
-              {template.category}
-            </span>
+            <div className="flex items-center justify-between">
+              <span
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${badgeClass}`}
+              >
+                {template.category}
+              </span>
+
+              {/* Price Badge */}
+              {template.price > 0 ? (
+                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                  <span className="text-[11px] leading-none">🪙</span> {template.price}
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200">
+                  Free
+                </span>
+              )}
+            </div>
           )}
         </div>
 
@@ -220,15 +237,20 @@ function RecommendedRow({
 
 // ─── Main TemplateGrid ────────────────────────────────────────────────────────
 
-export function TemplateGrid({ templates, recommendedTemplates, currentUserId }: TemplateGridProps) {
+interface TemplateGridProps {
+  templates: TemplateRow[]
+  recommendedTemplates: TemplateRow[]
+  currentUserId: string
+  purchasedTemplateIds?: string[]
+}
+
+export function TemplateGrid({ templates, recommendedTemplates, currentUserId, purchasedTemplateIds = [] }: TemplateGridProps) {
   const [search, setSearch] = React.useState('')
   const [selectedTemplate, setSelectedTemplate] = React.useState<TemplateRow | null>(null)
-  const [previewOpen, setPreviewOpen] = React.useState(false)
 
-  const handleSelect = (t: TemplateRow) => {
-    setSelectedTemplate(t)
-    setPreviewOpen(true)
-  }
+  const handleSelect = React.useCallback((template: TemplateRow) => {
+    setSelectedTemplate(template)
+  }, [])
 
   // Client-side filter by search query (name, style, description)
   const filterTemplates = (list: TemplateRow[]) => {
@@ -353,15 +375,10 @@ export function TemplateGrid({ templates, recommendedTemplates, currentUserId }:
 
       {/* Preview dialog */}
       <TemplatePreviewDialog
-        template={
-          selectedTemplate
-            ? {
-                ...selectedTemplate,
-              }
-            : null
-        }
-        open={previewOpen}
-        onOpenChange={setPreviewOpen}
+        template={selectedTemplate}
+        open={!!selectedTemplate}
+        onOpenChange={(o) => !o && setSelectedTemplate(null)}
+        isOwned={selectedTemplate ? (selectedTemplate.creator_id === currentUserId || purchasedTemplateIds.includes(selectedTemplate.id)) : false}
       />
     </>
   )

@@ -71,6 +71,8 @@ function PublishDialog({
   const [name, setName] = React.useState(defaultName)
   const [category, setCategory] = React.useState<Category>('Other')
   const [description, setDescription] = React.useState('')
+  const [isPremium, setIsPremium] = React.useState(false)
+  const [price, setPrice] = React.useState(10)
   const [state, setState] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = React.useState('')
 
@@ -79,6 +81,8 @@ function PublishDialog({
       setName(defaultName)
       setCategory('Other')
       setDescription('')
+      setIsPremium(false)
+      setPrice(10)
       setState('idle')
       setErrorMsg('')
     }
@@ -97,6 +101,7 @@ function PublishDialog({
           name: name.trim(),
           category,
           description: description.trim() || undefined,
+          price: isPremium ? price : 0,
         }),
       })
       const data = await res.json()
@@ -193,6 +198,55 @@ function PublishDialog({
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Pricing */}
+            <div className="flex flex-col gap-2">
+              <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                Pricing
+              </label>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setIsPremium(false)}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${
+                    !isPremium
+                      ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                      : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300'
+                  }`}
+                  disabled={state === 'loading'}
+                >
+                  Free Template
+                </button>
+                <button
+                  onClick={() => setIsPremium(true)}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-colors flex items-center justify-center gap-1.5 ${
+                    isPremium
+                      ? 'bg-amber-50 border-amber-200 text-amber-700'
+                      : 'bg-white border-slate-200 text-slate-600 hover:border-amber-300'
+                  }`}
+                  disabled={state === 'loading'}
+                >
+                  <span className="text-base leading-none">🪙</span> Premium
+                </button>
+              </div>
+              
+              {isPremium && (
+                <div className="flex items-center gap-3 mt-1 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  <span className="text-base leading-none">🪙</span>
+                  <div className="flex-1">
+                    <p className="text-xs font-medium text-slate-600">Price (Credits)</p>
+                  </div>
+                  <Input
+                    type="number"
+                    min={5}
+                    max={500}
+                    value={price}
+                    onChange={(e) => setPrice(parseInt(e.target.value) || 0)}
+                    className="w-24 text-right rounded-lg h-8 text-sm font-bold border-slate-200"
+                    disabled={state === 'loading'}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Description */}

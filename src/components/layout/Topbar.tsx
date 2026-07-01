@@ -19,6 +19,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Sidebar } from './Sidebar'
 import { AdminSidebar } from './AdminSidebar'
 import { NotificationBell } from './NotificationBell'
+import { CreditBadge } from './CreditBadge'
 import { useTheme } from '@/context/ThemeContext'
 
 export function Topbar() {
@@ -103,6 +104,9 @@ export function Topbar() {
         </Button>
 
         <NotificationBell />
+
+        {/* Credit balance — only for normal user area */}
+        {!isAdminArea && <CreditBadge />}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

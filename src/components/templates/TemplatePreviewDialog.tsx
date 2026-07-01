@@ -24,12 +24,14 @@ export type TemplateForPreview = {
   style: string | null
   is_featured: boolean
   uses: number
+  price: number
 }
 
 interface TemplatePreviewDialogProps {
   template: TemplateForPreview | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  isOwned: boolean
 }
 
 // ─── Category badge colours (mirrors page.tsx) ────────────────────────────────
@@ -63,11 +65,12 @@ function ColorSwatch({ color, label }: { color: string; label: string }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function TemplatePreviewDialog({ template, open, onOpenChange }: TemplatePreviewDialogProps) {
+export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }: TemplatePreviewDialogProps) {
   const router = useRouter()
   const [mode, setMode] = React.useState<'preview' | 'ai'>('preview')
   const [description, setDescription] = React.useState('')
   const [isGenerating, setIsGenerating] = React.useState(false)
+  const [isPurchasing, setIsPurchasing] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
   // Reset to preview mode when the dialog reopens
@@ -103,6 +106,26 @@ export function TemplatePreviewDialog({ template, open, onOpenChange }: Template
     } catch (err: any) {
       setError(err.message)
       setIsGenerating(false)
+    }
+  }
+
+  const handlePurchaseAndUse = async () => {
+    setIsPurchasing(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/templates/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template_id: template.id }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Purchase failed')
+      
+      // If purchase succeeds, immediately use it (without AI)
+      await handleUseWithoutAi()
+    } catch (err: any) {
+      setError(err.message)
+      setIsPurchasing(false)
     }
   }
 
@@ -219,26 +242,42 @@ export function TemplatePreviewDialog({ template, open, onOpenChange }: Template
 
               {/* Action buttons */}
               <div className="flex flex-col gap-2 pt-1">
-                <Button
-                  onClick={() => setMode('ai')}
-                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold h-11 rounded-xl gap-2"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  Use this template
-                </Button>
-                <Button
-                  onClick={handleUseWithoutAi}
-                  disabled={isGenerating}
-                  variant="outline"
-                  className="w-full h-10 rounded-xl font-semibold gap-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
-                >
-                  {isGenerating ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> Creating project…</>
-                  ) : (
-                    <><PenLine className="h-4 w-4" /> Use without AI</>
-                  )}
-                </Button>
-                {error && <p className="text-red-500 text-xs text-center">{error}</p>}
+                {template.price > 0 && !isOwned ? (
+                  <Button
+                    onClick={handlePurchaseAndUse}
+                    disabled={isPurchasing || isGenerating}
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold h-11 rounded-xl gap-2 shadow-md shadow-amber-200/50"
+                  >
+                    {isPurchasing ? (
+                      <><Loader2 className="h-4 w-4 animate-spin" /> Unlocking…</>
+                    ) : (
+                      <><span className="text-base leading-none">🪙</span> Unlock for {template.price} Credits</>
+                    )}
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      onClick={() => setMode('ai')}
+                      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold h-11 rounded-xl gap-2"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Use this template
+                    </Button>
+                    <Button
+                      onClick={handleUseWithoutAi}
+                      disabled={isGenerating}
+                      variant="outline"
+                      className="w-full h-10 rounded-xl font-semibold gap-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
+                    >
+                      {isGenerating ? (
+                        <><Loader2 className="h-4 w-4 animate-spin" /> Creating project…</>
+                      ) : (
+                        <><PenLine className="h-4 w-4" /> Use without AI</>
+                      )}
+                    </Button>
+                  </>
+                )}
+                {error && <p className="text-red-500 text-xs text-center font-medium bg-red-50 p-2 rounded-lg">{error}</p>}
               </div>
             </div>
           </>

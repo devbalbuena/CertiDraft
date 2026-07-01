@@ -7,6 +7,7 @@ const createProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(100),
   event_type: z.string().min(1, 'Event type is required'),
   description: z.string().optional(),
+  template_id: z.string().uuid().optional(),
 })
 
 // ── GET /api/projects ──────────────────────────────────────────────────────────
@@ -61,7 +62,40 @@ export async function POST(request: Request) {
     )
   }
 
-  const { name, event_type, description } = parsed.data
+  const { name, event_type, description, template_id } = parsed.data
+
+  let elements: string | null = null
+
+  if (template_id) {
+    // 1. Fetch template
+    const { data: template } = await supabase
+      .from('templates')
+      .select('creator_id, price, canvas_state')
+      .eq('id', template_id)
+      .single()
+
+    if (template) {
+      // 2. Check if premium
+      if (template.price && template.price > 0 && template.creator_id !== user.id) {
+        // Need to check if user purchased it
+        const { data: purchase } = await supabase
+          .from('template_purchases')
+          .select('id')
+          .eq('buyer_id', user.id)
+          .eq('template_id', template_id)
+          .maybeSingle()
+
+        if (!purchase) {
+          return NextResponse.json(
+            { error: 'Premium template requires purchase before use.' },
+            { status: 402 }
+          )
+        }
+      }
+      
+      elements = template.canvas_state
+    }
+  }
 
   const { data, error } = await supabase
     .from('projects')
@@ -71,6 +105,8 @@ export async function POST(request: Request) {
       event_type,
       description: description ?? null,
       status: 'draft',
+      template_id,
+      elements,
     })
     .select()
     .single()
