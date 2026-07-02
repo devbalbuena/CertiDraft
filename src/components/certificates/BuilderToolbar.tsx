@@ -65,48 +65,6 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
   } = useCanvasStore()
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
-  const [isAiPanelOpen, setIsAiPanelOpen] = React.useState(false)
-
-  // AI Panel State
-  const [aiRecipient, setAiRecipient] = React.useState('{{recipient_name}}')
-  const [aiAchievement, setAiAchievement] = React.useState('{{achievement}}')
-  const [aiEventType, setAiEventType] = React.useState('Course')
-  const [aiTone, setAiTone] = React.useState('formal')
-  const [isGenerating, setIsGenerating] = React.useState(false)
-  const [generatedCitation, setGeneratedCitation] = React.useState('')
-  const [aiError, setAiError] = React.useState('')
-
-  // Pre-fill from canvas on open
-  React.useEffect(() => {
-    if (isAiPanelOpen && canvas) {
-      // Find objects on canvas that might have replaced the placeholders
-      // In a real app we might tag them, but we'll try to find textboxes
-      // If we still see {{recipient_name}}, we leave it.
-      let foundRecipient = '{{recipient_name}}'
-      let foundAchievement = '{{achievement}}'
-      
-      canvas.getObjects().forEach((obj) => {
-        if (obj.type === 'textbox' || obj.type === 'i-text' || obj.type === 'text') {
-          const text = (obj as any).text || ''
-          // Simplistic heuristic: if there's a short text that isn't a placeholder, maybe it's the recipient
-          if (text && text.length < 40 && !text.includes('{{') && foundRecipient === '{{recipient_name}}') {
-            // We could set it, but it's safer to just default to the context if we had a proper data model.
-            // For now, let's just grab the project context if available, or leave defaults.
-            // The user's note specifically says: "read any existing {{recipient_name}} or {{achievement}} textbox values already on the canvas"
-            // Wait, maybe the user literally means if they exist on the canvas.
-          }
-        }
-      })
-      
-      // Look in canvas aiContext if we stored it
-      const aiContext = (canvas as any).aiContext
-      if (aiContext) {
-        if (aiContext.achievement) setAiAchievement(aiContext.achievement)
-        if (aiContext.eventType) setAiEventType(aiContext.eventType)
-        if (aiContext.tone) setAiTone(aiContext.tone)
-      }
-    }
-  }, [isAiPanelOpen, canvas])
 
   const addText = (text = 'Double click to edit') => {
     if (!canvas) return
@@ -203,35 +161,6 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
     })
   }
 
-  const handleGenerateCitation = async () => {
-    setIsGenerating(true)
-    setAiError('')
-    try {
-      const res = await fetch('/api/ai/citation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipientName: aiRecipient,
-          achievement: aiAchievement,
-          eventType: aiEventType,
-          tone: aiTone
-        })
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to generate')
-      setGeneratedCitation(data.citation)
-    } catch (err: any) {
-      setAiError(err.message)
-    } finally {
-      setIsGenerating(false)
-    }
-  }
-
-  const insertCitationToCanvas = () => {
-    if (!generatedCitation) return
-    addText(generatedCitation)
-  }
-
   const canUndo = historyIndex > 0
   const canRedo = historyIndex < canvasHistory.length - 1
 
@@ -309,20 +238,6 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-
-      {/* AI Assist Toggle */}
-      <button
-        onClick={() => setIsAiPanelOpen(!isAiPanelOpen)}
-        className={cn(
-          "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm ml-1",
-          isAiPanelOpen 
-            ? "bg-indigo-600 border-indigo-500 text-white shadow-indigo-900/40" 
-            : "bg-indigo-500/10 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20"
-        )}
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        <span>AI Assist</span>
-      </button>
 
       <div className="w-px h-6 bg-slate-200 mx-1" />
 
@@ -403,108 +318,6 @@ export function BuilderToolbar({ onSave }: { onSave: (json: string) => void }) {
           Save Design
         </button>
       </div>
-
-      {/* AI Sliding Panel (Absolute Positioned) */}
-      {isAiPanelOpen && (
-        <div className="absolute top-[48px] right-[260px] w-80 bg-[#1e293b] border border-slate-700 shadow-2xl z-[60] flex flex-col rounded-bl-xl overflow-hidden animate-in slide-in-from-right-8 duration-200">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-900/40">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-indigo-400" />
-              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">AI Citation Draft</h3>
-            </div>
-            <button onClick={() => setIsAiPanelOpen(false)} className="text-slate-500 hover:text-slate-300 p-1">
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          
-          <div className="p-4 flex flex-col gap-4 max-h-[600px] overflow-y-auto custom-scrollbar">
-            {aiError && (
-              <div className="p-2.5 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-xs">
-                {aiError}
-              </div>
-            )}
-            
-            {!generatedCitation ? (
-              <>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Recipient Name</Label>
-                  <Input 
-                    value={aiRecipient} 
-                    onChange={e => setAiRecipient(e.target.value)} 
-                    className="h-8 text-xs bg-slate-900/60 border-slate-700 text-slate-200"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Achievement</Label>
-                  <Input 
-                    value={aiAchievement} 
-                    onChange={e => setAiAchievement(e.target.value)} 
-                    className="h-8 text-xs bg-slate-900/60 border-slate-700 text-slate-200"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Event Type</Label>
-                    <Input 
-                      value={aiEventType} 
-                      onChange={e => setAiEventType(e.target.value)} 
-                      className="h-8 text-xs bg-slate-900/60 border-slate-700 text-slate-200"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Tone</Label>
-                    <Select value={aiTone} onValueChange={setAiTone}>
-                      <SelectTrigger className="h-8 text-xs bg-slate-900/60 border-slate-700 text-slate-200 focus:ring-0">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1e293b] border-slate-700 text-slate-300">
-                        <SelectItem value="formal" className="text-xs hover:bg-slate-800">Formal</SelectItem>
-                        <SelectItem value="warm" className="text-xs hover:bg-slate-800">Warm</SelectItem>
-                        <SelectItem value="inspiring" className="text-xs hover:bg-slate-800">Inspiring</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <Button 
-                  onClick={handleGenerateCitation} 
-                  disabled={isGenerating}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold h-9 mt-2"
-                >
-                  {isGenerating ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Drafting...</> : 'Generate Citation'}
-                </Button>
-              </>
-            ) : (
-              <>
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-emerald-400 uppercase font-bold tracking-wider flex items-center gap-1">
-                    <Check className="h-3 w-3" /> Draft Ready
-                  </Label>
-                  <Textarea 
-                    value={generatedCitation}
-                    onChange={e => setGeneratedCitation(e.target.value)}
-                    className="text-xs min-h-[120px] bg-slate-900/60 border-slate-700 text-slate-200 resize-none focus:border-indigo-500 p-3 leading-relaxed"
-                  />
-                </div>
-                <div className="flex gap-2 mt-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setGeneratedCitation('')}
-                    className="flex-1 bg-transparent border-slate-700 text-slate-300 hover:bg-slate-800 hover:text-white text-xs h-9"
-                  >
-                    Regenerate
-                  </Button>
-                  <Button 
-                    onClick={insertCitationToCanvas}
-                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold h-9 shadow-lg shadow-indigo-900/40"
-                  >
-                    Insert to Canvas
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 
     </div>
   )

@@ -4,6 +4,17 @@ import * as React from 'react'
 import * as fabric from 'fabric'
 import { useCanvasStore } from '@/lib/canvas-store'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Type,
   Square,
@@ -20,6 +31,8 @@ import {
   LayoutGrid,
   QrCode,
   Loader2,
+  Sparkles,
+  Check
 } from 'lucide-react'
 
 function getObjectIcon(type?: string) {
@@ -67,8 +80,29 @@ const VARIABLE_CHIPS = [
 export function BuilderLayersPanel() {
   const { canvas, selectedElement, setSelectedElement, pushHistory } = useCanvasStore()
   const [objects, setObjects] = React.useState<fabric.Object[]>([])
-  const [activeTab, setActiveTab] = React.useState<'layers' | 'elements' | 'variables'>('layers')
+  const [activeTab, setActiveTab] = React.useState<'layers' | 'elements' | 'variables' | 'ai'>('layers')
   const [isAddingQR, setIsAddingQR] = React.useState(false)
+
+  // AI Panel State
+  const [aiRecipient, setAiRecipient] = React.useState('{{recipient_name}}')
+  const [aiAchievement, setAiAchievement] = React.useState('{{achievement}}')
+  const [aiEventType, setAiEventType] = React.useState('Course')
+  const [aiTone, setAiTone] = React.useState('formal')
+  const [isGenerating, setIsGenerating] = React.useState(false)
+  const [generatedCitation, setGeneratedCitation] = React.useState('')
+  const [aiError, setAiError] = React.useState('')
+
+  // Pre-fill from canvas on AI tab open
+  React.useEffect(() => {
+    if (activeTab === 'ai' && canvas) {
+      const aiContext = (canvas as any).aiContext
+      if (aiContext) {
+        if (aiContext.achievement) setAiAchievement(aiContext.achievement)
+        if (aiContext.eventType) setAiEventType(aiContext.eventType)
+        if (aiContext.tone) setAiTone(aiContext.tone)
+      }
+    }
+  }, [activeTab, canvas])
 
   const refreshObjects = React.useCallback(() => {
     if (!canvas) return
@@ -187,10 +221,49 @@ export function BuilderLayersPanel() {
     pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
   }
 
+  const handleGenerateCitation = async () => {
+    setIsGenerating(true)
+    setAiError('')
+    try {
+      const res = await fetch('/api/ai/citation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipientName: aiRecipient,
+          achievement: aiAchievement,
+          eventType: aiEventType,
+          tone: aiTone
+        })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to generate')
+      setGeneratedCitation(data.citation)
+    } catch (err: any) {
+      setAiError(err.message)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const insertCitationToCanvas = () => {
+    if (!generatedCitation) return
+    if (!canvas) return
+    const textObj = new fabric.Textbox(generatedCitation, {
+      left: 421, top: 297, fontFamily: 'Inter', fontSize: 24,
+      fill: '#000000', width: 300, textAlign: 'center',
+      originX: 'center', originY: 'center',
+    })
+    canvas.add(textObj)
+    canvas.setActiveObject(textObj)
+    canvas.requestRenderAll()
+    pushHistory(JSON.stringify((canvas as any).toJSON(['isQRCode'])))
+  }
+
   const tabs = [
     { id: 'layers' as const,    icon: <Layers className="h-4 w-4" />,     label: 'Layers' },
     { id: 'elements' as const,  icon: <LayoutGrid className="h-4 w-4" />,  label: 'Elements' },
     { id: 'variables' as const, icon: <Variable className="h-4 w-4" />,    label: 'Variables' },
+    { id: 'ai' as const,        icon: <Sparkles className="h-4 w-4" />,    label: 'AI Assist' },
   ]
 
   return (
@@ -204,10 +277,14 @@ export function BuilderLayersPanel() {
             onClick={() => setActiveTab(tab.id)}
             title={tab.label}
             className={cn(
-              'flex-1 flex flex-col items-center gap-1 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors',
+              'flex-1 flex flex-col items-center gap-1 py-2.5 text-[9px] font-semibold uppercase tracking-wider transition-colors',
               activeTab === tab.id
-                ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50'
-                : 'text-slate-400 hover:text-slate-700'
+                ? tab.id === 'ai' 
+                  ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' 
+                  : 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50'
+                : tab.id === 'ai'
+                  ? 'text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/30'
+                  : 'text-slate-400 hover:text-slate-700 hover:bg-slate-50'
             )}
           >
             {tab.icon}
@@ -353,6 +430,98 @@ export function BuilderLayersPanel() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* AI Assist Tab */}
+      {activeTab === 'ai' && (
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 custom-scrollbar bg-indigo-50/30">
+          <div className="text-xs text-indigo-700 font-medium leading-relaxed bg-indigo-100/50 p-2.5 rounded-lg border border-indigo-100">
+            Let AI write a professional citation for you. Fill in the details below.
+          </div>
+          
+          {aiError && (
+            <div className="p-2.5 rounded bg-red-50 text-red-600 border border-red-200 text-xs">
+              {aiError}
+            </div>
+          )}
+          
+          {!generatedCitation ? (
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] text-slate-600 uppercase font-bold tracking-wider">Recipient Name</Label>
+                <Input 
+                  value={aiRecipient} 
+                  onChange={e => setAiRecipient(e.target.value)} 
+                  className="h-8 text-xs border-slate-200 focus-visible:ring-indigo-500 bg-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] text-slate-600 uppercase font-bold tracking-wider">Achievement</Label>
+                <Input 
+                  value={aiAchievement} 
+                  onChange={e => setAiAchievement(e.target.value)} 
+                  className="h-8 text-xs border-slate-200 focus-visible:ring-indigo-500 bg-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] text-slate-600 uppercase font-bold tracking-wider">Event Type</Label>
+                <Input 
+                  value={aiEventType} 
+                  onChange={e => setAiEventType(e.target.value)} 
+                  className="h-8 text-xs border-slate-200 focus-visible:ring-indigo-500 bg-white"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] text-slate-600 uppercase font-bold tracking-wider">Tone</Label>
+                <Select value={aiTone} onValueChange={setAiTone}>
+                  <SelectTrigger className="h-8 text-xs border-slate-200 focus-visible:ring-indigo-500 bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="formal" className="text-xs">Formal</SelectItem>
+                    <SelectItem value="warm" className="text-xs">Warm</SelectItem>
+                    <SelectItem value="inspiring" className="text-xs">Inspiring</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button 
+                onClick={handleGenerateCitation} 
+                disabled={isGenerating || !aiRecipient || !aiAchievement || !aiEventType}
+                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold h-9 mt-2 shadow-sm shadow-indigo-200"
+              >
+                {isGenerating ? <><Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> Drafting...</> : <><Sparkles className="mr-1.5 h-3.5 w-3.5" /> Generate Citation</>}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3 flex flex-col h-full">
+              <div className="space-y-1.5 flex-1 flex flex-col">
+                <Label className="text-[10px] text-emerald-600 uppercase font-bold tracking-wider flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Draft Ready
+                </Label>
+                <Textarea 
+                  value={generatedCitation}
+                  onChange={e => setGeneratedCitation(e.target.value)}
+                  className="text-xs flex-1 min-h-[160px] bg-white border-slate-200 focus:border-indigo-500 p-3 leading-relaxed focus-visible:ring-indigo-500"
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-auto pt-2">
+                <Button 
+                  onClick={insertCitationToCanvas}
+                  className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold h-9 shadow-md shadow-indigo-200"
+                >
+                  <Check className="h-4 w-4 mr-1.5" /> Insert to Canvas
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setGeneratedCitation('')}
+                  className="w-full bg-white border-slate-200 text-slate-600 hover:bg-slate-50 text-xs h-9"
+                >
+                  Regenerate
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
