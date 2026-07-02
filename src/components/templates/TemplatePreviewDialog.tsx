@@ -10,6 +10,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Star, Sparkles, Loader2, ArrowRight, PenLine, X } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -72,6 +74,7 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
   const [isGenerating, setIsGenerating] = React.useState(false)
   const [isPurchasing, setIsPurchasing] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [projectName, setProjectName] = React.useState('')
 
   // Reset to preview mode when the dialog reopens
   React.useEffect(() => {
@@ -79,8 +82,11 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
       setMode('preview')
       setDescription('')
       setError(null)
+      if (template) {
+        setProjectName(`${template.name} Project`)
+      }
     }
-  }, [open])
+  }, [open, template])
 
   if (!template) return null
 
@@ -95,7 +101,11 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
       const res = await fetch('/api/ai/generate-project', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: fullDescription, baseTemplateId: template.id }),
+        body: JSON.stringify({ 
+          description: fullDescription, 
+          baseTemplateId: template.id,
+          projectName: projectName.trim() || undefined
+        }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to generate project')
@@ -136,7 +146,7 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: `${template.name} Project`,
+          name: projectName.trim() || `${template.name} Project`,
           template_id: template.id,
           event_type: template.category,
           description: '',
@@ -244,7 +254,17 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
               )}
 
               {/* Action buttons */}
-              <div className="flex flex-col gap-2 pt-1">
+              <div className="flex flex-col gap-2 pt-2">
+                <div className="space-y-1.5 pb-2">
+                  <Label className="text-xs text-slate-500 font-bold uppercase tracking-wider">Project Name</Label>
+                  <Input 
+                    value={projectName}
+                    onChange={(e) => setProjectName(e.target.value)}
+                    className="h-10 text-sm font-medium border-slate-200 focus-visible:ring-indigo-500"
+                    placeholder={`${template.name} Project`}
+                  />
+                </div>
+
                 {template.price > 0 && !isOwned ? (
                   <Button
                     onClick={handlePurchaseAndUse}

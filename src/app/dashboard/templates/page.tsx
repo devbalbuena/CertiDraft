@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/layout/EmptyState'
 import { LayoutTemplate } from 'lucide-react'
@@ -56,7 +57,7 @@ export default async function TemplatesPage() {
     .not('event_type', 'is', null)
 
   // ── 4. Fetch User's Purchased Templates ─────────────────────────────────────
-  const { data: purchases } = await supabase
+  const { data: purchases } = await supabaseAdmin
     .from('template_purchases')
     .select('template_id')
     .eq('buyer_id', user.id)
