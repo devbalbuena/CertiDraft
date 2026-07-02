@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 // ── Validation schema ──────────────────────────────────────────────────────────
 const createProjectSchema = z.object({
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
       // 2. Check if premium
       if (template.price && template.price > 0 && template.creator_id !== user.id) {
         // Need to check if user purchased it
-        const { data: purchase } = await supabase
+        const { data: purchase } = await supabaseAdmin
           .from('template_purchases')
           .select('id')
           .eq('buyer_id', user.id)

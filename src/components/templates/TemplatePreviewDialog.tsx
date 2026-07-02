@@ -122,14 +122,14 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
       if (!res.ok) throw new Error(data.error || 'Purchase failed')
       
       // If purchase succeeds, immediately use it (without AI)
-      await handleUseWithoutAi()
+      await handleUseWithoutAi(true)
     } catch (err: any) {
       setError(err.message)
       setIsPurchasing(false)
     }
   }
 
-  const handleUseWithoutAi = async () => {
+  const handleUseWithoutAi = async (isFromPurchase = false) => {
     setIsGenerating(true)
     try {
       const res = await fetch('/api/projects', {
@@ -151,6 +151,9 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
     } catch (err: any) {
       setError(err.message)
       setIsGenerating(false)
+      if (isFromPurchase) {
+        setIsPurchasing(false)
+      }
     }
   }
 
@@ -264,7 +267,7 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
                       Use this template
                     </Button>
                     <Button
-                      onClick={handleUseWithoutAi}
+                      onClick={() => handleUseWithoutAi(false)}
                       disabled={isGenerating}
                       variant="outline"
                       className="w-full h-10 rounded-xl font-semibold gap-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
