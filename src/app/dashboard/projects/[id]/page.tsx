@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { ProjectManager } from '@/components/projects/ProjectManager'
+import { InlineProjectTitle } from '@/components/projects/InlineProjectTitle'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -92,8 +92,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </Button>
       </div>
 
-      {/* Page header — no status badge here, status lives in the stepper progress */}
-      <PageHeader title={project.name} subtitle="" />
+      {/* Inline editable project title */}
+      <InlineProjectTitle projectId={project.id} initialName={project.name} />
 
       {/* Guided stepper or Expert dashboard — managed by ProjectManager */}
       <div className="mt-8">
