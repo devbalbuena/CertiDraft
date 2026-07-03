@@ -379,6 +379,7 @@ export function TemplateGrid({ templates, recommendedTemplates, currentUserId, p
         open={!!selectedTemplate}
         onOpenChange={(o) => !o && setSelectedTemplate(null)}
         isOwned={selectedTemplate ? (selectedTemplate.creator_id === currentUserId || purchasedTemplateIds.includes(selectedTemplate.id)) : false}
+        currentUserId={currentUserId}
       />
     </>
   )

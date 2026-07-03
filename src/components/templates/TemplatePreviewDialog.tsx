@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Star, Sparkles, Loader2, ArrowRight, PenLine, X } from 'lucide-react'
+import { InlineTemplateTitle } from './InlineTemplateTitle'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,6 +28,7 @@ export type TemplateForPreview = {
   is_featured: boolean
   uses: number
   price: number
+  creator_id: string | null
 }
 
 interface TemplatePreviewDialogProps {
@@ -34,6 +36,7 @@ interface TemplatePreviewDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   isOwned: boolean
+  currentUserId: string
 }
 
 // ─── Category badge colours (mirrors page.tsx) ────────────────────────────────
@@ -67,7 +70,13 @@ function ColorSwatch({ color, label }: { color: string; label: string }) {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }: TemplatePreviewDialogProps) {
+export function TemplatePreviewDialog({
+  template,
+  open,
+  onOpenChange,
+  isOwned,
+  currentUserId,
+}: TemplatePreviewDialogProps) {
   const router = useRouter()
   const [mode, setMode] = React.useState<'preview' | 'ai'>('preview')
   const [description, setDescription] = React.useState('')
@@ -214,9 +223,15 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
             <div className="p-5 space-y-4 bg-white dark:bg-slate-950">
               {/* Name + category */}
               <div className="flex items-start justify-between gap-2">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
-                  {template.name}
-                </h2>
+                <div className="flex-1">
+                  {template.creator_id === currentUserId ? (
+                    <InlineTemplateTitle templateId={template.id} initialName={template.name} />
+                  ) : (
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
+                      {template.name}
+                    </h2>
+                  )}
+                </div>
                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border flex-shrink-0 ${badgeClass}`}>
                   {template.category}
                 </span>
@@ -255,8 +270,13 @@ export function TemplatePreviewDialog({ template, open, onOpenChange, isOwned }:
 
               {/* Action buttons */}
               <div className="flex flex-col gap-2 pt-2">
-                <div className="space-y-1.5 pb-2">
-                  <Label className="text-xs text-slate-500 font-bold uppercase tracking-wider">Project Name</Label>
+                <div className="space-y-1.5 pb-2 border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
+                  <Label className="text-xs text-slate-500 font-bold uppercase tracking-wider">
+                    Name your new project
+                  </Label>
+                  <p className="text-[10px] text-slate-400 font-medium pb-0.5">
+                    This will be the name of your project, not the template.
+                  </p>
                   <Input 
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
